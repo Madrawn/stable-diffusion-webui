@@ -197,7 +197,11 @@ class KDiffusionSampler(sd_samplers_common.Sampler):
 
         sigmas = self.get_sigmas(p, steps)
 
-        x = x * sigmas[0]
+        if opts.sgm_noise_multiplier:
+            p.extra_generation_params["SGM noise multiplier"] = True
+            x = x * torch.sqrt(1.0 + sigmas[0] ** 2.0)
+        else:
+            x = x * sigmas[0]
 
         extra_params_kwargs = self.initialize(p)
         parameters = inspect.signature(self.func).parameters
