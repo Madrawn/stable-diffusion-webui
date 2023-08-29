@@ -195,6 +195,9 @@ def load_clip_dict(filename, map_location):
         if key.startswith("text_model."):
             new_key = "transformer."+key
             clip_dict_1[new_key] = clip_dict_1.pop(key)
+        if key.startswith("cond_stage_model."):
+            new_key = key.removeprefix("cond_stage_model.")
+            clip_dict_1[new_key] = clip_dict_1.pop(key)
     return clip_dict_1
 
 
