@@ -184,15 +184,11 @@ class UiSettings:
                 self.text_settings = gr.Textbox(elem_id="settings_json", value=lambda: opts.dumpjson(), visible=False)
 
             unload_sd_model.click(
-                fn=sd_models.unload_model_weights,
-                inputs=[],
-                outputs=[]
+                fn=sd_models.unload_model_weights
             )
 
             reload_sd_model.click(
-                fn=sd_models.reload_model_weights,
-                inputs=[],
-                outputs=[]
+                fn=sd_models.reload_model_weights
             )
 
             request_notifications.click(
