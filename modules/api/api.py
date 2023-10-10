@@ -29,7 +29,7 @@ from modules.sd_models import unload_model_weights, reload_model_weights, checkp
 from modules.sd_models_config import find_checkpoint_config_near_filename
 from modules.realesrgan_model import get_realesrgan_models
 from modules import devices
-from typing import Any
+from typing import Any, List
 import piexif
 import piexif.helper
 from contextlib import closing
