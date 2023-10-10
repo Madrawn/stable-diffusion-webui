@@ -49,15 +49,17 @@ def refresh_unet_list():
     modules.sd_unet.list_unets()
 
 
+
+
 def refresh_clip_list():
     import modules.sd_clip
 
     modules.sd_clip.refresh_clip_list()
 
 
-def list_checkpoint_tiles():
+def list_checkpoint_tiles(use_short=False):
     import modules.sd_models
-    return modules.sd_models.checkpoint_tiles()
+    return modules.sd_models.checkpoint_tiles(use_short)
 
 
 def refresh_checkpoints():
