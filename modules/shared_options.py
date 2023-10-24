@@ -62,6 +62,8 @@ options_templates.update(options_section(('saving-images', "Saving images/grids"
     "clean_temp_dir_at_start": OptionInfo(False, "Cleanup non-default temporary directory when starting webui"),
 
     "save_incomplete_images": OptionInfo(False, "Save incomplete images").info("save images that has been interrupted in mid-generation; even if not saved, they will still show up in webui output."),
+
+    "notification_audio": OptionInfo(True, "Play notification sound after image generation").info("notification.mp3 should be present in the root directory").needs_reload_ui(),
 }))
 
 options_templates.update(options_section(('saving-paths', "Paths for saving"), {
@@ -110,6 +112,7 @@ options_templates.update(options_section(('system', "System"), {
     "list_hidden_files": OptionInfo(True, "Load models/files in hidden directories").info("directory is hidden if its name starts with \".\""),
     "disable_mmap_load_safetensors": OptionInfo(False, "Disable memmapping for loading .safetensors files.").info("fixes very slow loading speed in some cases"),
     "hide_ldm_prints": OptionInfo(True, "Prevent Stability-AI's ldm/sgm modules from printing noise to console."),
+    "dump_stacks_on_signal": OptionInfo(False, "Print stack traces before exiting the program with ctrl+c."),
 }))
 
 options_templates.update(options_section(('API', "API"), {
@@ -338,4 +341,3 @@ options_templates.update(options_section((None, "Hidden options"), {
     "restore_config_state_file": OptionInfo("", "Config state file to restore from, under 'config-states/' folder"),
     "sd_checkpoint_hash": OptionInfo("", "SHA256 hash of the current checkpoint"),
 }))
-
