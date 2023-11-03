@@ -377,6 +377,7 @@ def create_ui():
                         with gr.Row(elem_id="txt2img_accordions", elem_classes="accordions"):
                             with InputAccordion(False, label="Hires. fix", elem_id="txt2img_hr") as enable_hr:
                                 with enable_hr.extra():
+                                    hr_repeat = gr.Slider(minimum=1, step=1, label="Repeat n times", value=1, elem_id="txt2img_hr_repeat")
                                     hr_final_resolution = FormHTML(value="", elem_id="txtimg_hr_finalres", label="Upscaled resolution", interactive=False, min_width=0)
 
                                 with FormRow(elem_id="txt2img_hires_fix_row1", variant="compact"):
@@ -470,6 +471,7 @@ def create_ui():
                     hr_sampler_name,
                     hr_prompt,
                     hr_negative_prompt,
+                    hr_repeat,
                     override_settings,
 
                 ] + custom_inputs,

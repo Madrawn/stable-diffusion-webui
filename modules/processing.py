@@ -1028,7 +1028,7 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
     hr_sampler_name: str = None
     hr_prompt: str = ''
     hr_negative_prompt: str = ''
-
+    hr_repeat: int = 1
     cached_hr_uc = [None, None]
     cached_hr_c = [None, None]
 
@@ -1128,12 +1128,15 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
                 if state.job_count == -1:
                     state.job_count = self.n_iter
 
-                shared.total_tqdm.updateTotal((self.steps + (self.hr_second_pass_steps or self.steps)) * state.job_count)
-                state.job_count = state.job_count * 2
+                shared.total_tqdm.updateTotal((self.steps + (self.hr_second_pass_steps or self.steps) * self.hr_repeat) * state.job_count)
+                state.job_count = state.job_count * (2 + self.hr_repeat)
                 state.processing_has_refined_job_count = True
 
             if self.hr_second_pass_steps:
                 self.extra_generation_params["Hires steps"] = self.hr_second_pass_steps
+
+            if self.hr_repeat > 1:
+                self.extra_generation_params["Hires repeats"] = self.hr_repeat
 
             if self.hr_upscaler is not None:
                 self.extra_generation_params["Hires upscaler"] = self.hr_upscaler
