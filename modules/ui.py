@@ -377,8 +377,11 @@ def create_ui():
                         with gr.Row(elem_id="txt2img_accordions", elem_classes="accordions"):
                             with InputAccordion(False, label="Hires. fix", elem_id="txt2img_hr") as enable_hr:
                                 with enable_hr.extra():
-                                    hr_repeat = gr.Slider(minimum=1, step=1, label="Repeat n times", value=1, elem_id="txt2img_hr_repeat")
                                     hr_final_resolution = FormHTML(value="", elem_id="txtimg_hr_finalres", label="Upscaled resolution", interactive=False, min_width=0)
+
+                                with FormRow(elem_id="txt2img_hires_fix_row0", variant="compact"):
+                                    hr_shrink = gr.Checkbox(value=True, label="Shrink latent between repeats", elem_id="txt2img_hr_shrink",scale=0, min_width=100)
+                                    hr_repeat = gr.Slider(minimum=1, step=1, label="Repeat n times", value=1, elem_id="txt2img_hr_repeat",scale=1)
 
                                 with FormRow(elem_id="txt2img_hires_fix_row1", variant="compact"):
                                     hr_upscaler = gr.Dropdown(label="Upscaler", elem_id="txt2img_hr_upscaler", choices=[*shared.latent_upscale_modes, *[x.name for x in shared.sd_upscalers]], value=shared.latent_upscale_default_mode)
@@ -472,6 +475,7 @@ def create_ui():
                     hr_prompt,
                     hr_negative_prompt,
                     hr_repeat,
+                    hr_shrink,
                     override_settings,
 
                 ] + custom_inputs,
