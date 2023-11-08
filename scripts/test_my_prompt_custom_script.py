@@ -23,9 +23,9 @@ class Script(scripts.Script):
     def ui(self, is_img2img):
         neg_pos = gr.Dropdown(label="Test negative or positive", choices=["Positive","Negative"], value="Positive")
         action = gr.Radio(label="Action", choices=["Remove","Attention", "Wrap in"], value="Remove")
-        with gr.Column("Attention",visible=False) as att:
+        with gr.Column(visible=False) as att:
             attention_strength = gr.Slider(minimum=-2, maximum=2, step=0.1, label='Attention Strength', value=1.4)
-        with gr.Column("Wrap in",visible=False) as wrap:
+        with gr.Column(visible=False) as wrap:
             prefix = gr.Textbox(label="Before prompt", lines=1, value="(")
             suffix = gr.Textbox(label="after prompt", lines=1, value=")")
         def update_visible(action_type):
