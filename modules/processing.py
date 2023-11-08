@@ -149,6 +149,13 @@ class StableDiffusionProcessing:
     s_tmax: float = None
     s_tmin: float = None
     s_noise: float = None
+    rtol: float = None
+    atol: float = None
+    h_init: float = None
+    pcoeff: float = None
+    icoeff: float = None
+    dcoeff: float = None
+
     override_settings: dict[str, Any] = None
     override_settings_restore_afterwards: bool = True
     sampler_index: int = None
@@ -217,6 +224,12 @@ class StableDiffusionProcessing:
         self.s_tmin = self.s_tmin if self.s_tmin is not None else opts.s_tmin
         self.s_tmax = (self.s_tmax if self.s_tmax is not None else opts.s_tmax) or float('inf')
         self.s_noise = self.s_noise if self.s_noise is not None else opts.s_noise
+        self.atol = self.atol if self.atol is not None else opts.atol
+        self.rtol = self.rtol if self.rtol is not None else opts.rtol
+        self.h_init = self.h_init if self.h_init is not None else opts.h_init
+        self.pcoeff = self.pcoeff if self.pcoeff is not None else opts.pcoeff
+        self.icoeff = self.icoeff if self.icoeff is not None else opts.icoeff
+        self.dcoeff = self.dcoeff if self.dcoeff is not None else opts.dcoeff
 
         self.extra_generation_params = self.extra_generation_params or {}
         self.override_settings = self.override_settings or {}

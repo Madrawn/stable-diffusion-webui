@@ -50,6 +50,7 @@ sampler_extra_params = {
     'sample_heun': ['s_churn', 's_tmin', 's_tmax', 's_noise'],
     'sample_dpm_2': ['s_churn', 's_tmin', 's_tmax', 's_noise'],
     'sample_dpm_fast': ['s_noise'],
+    'sample_dpm_adaptive': ['s_noise', 'rtol', 'atol', 'h_init', 'pcoeff', 'icoeff', 'dcoeff'],
     'sample_dpm_2_ancestral': ['s_noise'],
     'sample_dpmpp_2s_ancestral': ['s_noise'],
     'sample_dpmpp_sde': ['s_noise'],

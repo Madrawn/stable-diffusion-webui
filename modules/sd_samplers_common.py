@@ -230,6 +230,12 @@ class Sampler:
         self.s_tmin = 0.0
         self.s_tmax = float('inf')
         self.s_noise = 1.0
+        self.rtol: float = 0.05
+        self.atol: float = 0.0078
+        self.h_init: float = 0.05
+        self.pcoeff: float = 0.
+        self.icoeff: float = 1.
+        self.dcoeff: float = 0.   
 
         self.eta_option_field = 'eta_ancestral'
         self.eta_infotext_field = 'Eta'
@@ -300,6 +306,12 @@ class Sampler:
             s_tmin = getattr(opts, 's_tmin', p.s_tmin)
             s_tmax = getattr(opts, 's_tmax', p.s_tmax) or self.s_tmax # 0 = inf
             s_noise = getattr(opts, 's_noise', p.s_noise)
+            rtol = getattr(opts, 'rtol', p.rtol)
+            atol = getattr(opts, 'atol', p.atol)
+            h_init = getattr(opts, 'h_init', p.h_init)
+            pcoeff = getattr(opts, 'pcoeff', p.pcoeff)
+            icoeff = getattr(opts, 'icoeff', p.icoeff)
+            dcoeff = getattr(opts, 'dcoeff', p.dcoeff)
 
             if 's_churn' in extra_params_kwargs and s_churn != self.s_churn:
                 extra_params_kwargs['s_churn'] = s_churn
@@ -317,6 +329,30 @@ class Sampler:
                 extra_params_kwargs['s_noise'] = s_noise
                 p.s_noise = s_noise
                 p.extra_generation_params['Sigma noise'] = s_noise
+            if 'rtol' in extra_params_kwargs and rtol != self.rtol:
+                extra_params_kwargs['rtol'] = rtol
+                p.rtol = rtol
+                p.extra_generation_params['rtol'] = rtol
+            if 'atol' in extra_params_kwargs and atol != self.atol:
+                extra_params_kwargs['atol'] = atol
+                p.atol = atol
+                p.extra_generation_params['atol'] = atol
+            if 'h_init' in extra_params_kwargs and h_init != self.h_init:
+                extra_params_kwargs['h_init'] = h_init
+                p.h_init = h_init
+                p.extra_generation_params['h_init'] = h_init
+            if 'pcoeff' in extra_params_kwargs and pcoeff != self.pcoeff:
+                extra_params_kwargs['pcoeff'] = pcoeff
+                p.pcoeff = pcoeff
+                p.extra_generation_params['pcoeff'] = pcoeff
+            if 'icoeff' in extra_params_kwargs and icoeff != self.icoeff:
+                extra_params_kwargs['icoeff'] = icoeff
+                p.icoeff = icoeff
+                p.extra_generation_params['icoeff'] = icoeff
+            if 'dcoeff' in extra_params_kwargs and dcoeff != self.dcoeff:
+                extra_params_kwargs['dcoeff'] = dcoeff
+                p.dcoeff = dcoeff
+                p.extra_generation_params['dcoeff'] = dcoeff
 
         return extra_params_kwargs
 
