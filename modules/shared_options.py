@@ -21,51 +21,52 @@ restricted_opts = {
     "outdir_init_images"
 }
 
-options_templates.update(options_section(('saving-images', "Saving images/grids"), {
-    "samples_save": OptionInfo(True, "Always save all generated images"),
-    "samples_format": OptionInfo('png', 'File format for images'),
-    "samples_filename_pattern": OptionInfo("", "Images filename pattern", component_args=hide_dirs).link("wiki", "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Custom-Images-Filename-Name-and-Subdirectory"),
-    "save_images_add_number": OptionInfo(True, "Add number to filename when saving", component_args=hide_dirs),
-    "save_images_replace_action": OptionInfo("Replace", "Saving the image to an existing file", gr.Radio, {"choices": ["Replace", "Add number suffix"], **hide_dirs}),
-    "grid_save": OptionInfo(True, "Always save all generated image grids"),
-    "grid_format": OptionInfo('png', 'File format for grids'),
-    "grid_extended_filename": OptionInfo(False, "Add extended info (seed, prompt) to filename when saving grid"),
-    "grid_only_if_multiple": OptionInfo(True, "Do not save grids consisting of one picture"),
-    "grid_prevent_empty_spots": OptionInfo(False, "Prevent empty spots in grid (when set to autodetect)"),
-    "grid_zip_filename_pattern": OptionInfo("", "Archive filename pattern", component_args=hide_dirs).link("wiki", "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Custom-Images-Filename-Name-and-Subdirectory"),
-    "n_rows": OptionInfo(-1, "Grid row count; use -1 for autodetect and 0 for it to be same as batch size", gr.Slider, {"minimum": -1, "maximum": 16, "step": 1}),
-    "font": OptionInfo("", "Font for image grids that have text"),
-    "grid_text_active_color": OptionInfo("#000000", "Text color for image grids", ui_components.FormColorPicker, {}),
-    "grid_text_inactive_color": OptionInfo("#999999", "Inactive text color for image grids", ui_components.FormColorPicker, {}),
-    "grid_background_color": OptionInfo("#ffffff", "Background color for image grids", ui_components.FormColorPicker, {}),
-
-    "enable_pnginfo": OptionInfo(True, "Save text information about generation parameters as chunks to png files"),
-    "save_txt": OptionInfo(False, "Create a text file next to every image with generation parameters."),
-    "save_images_before_face_restoration": OptionInfo(False, "Save a copy of image before doing face restoration."),
-    "save_images_before_highres_fix": OptionInfo(False, "Save a copy of image before applying highres fix."),
-    "save_images_before_color_correction": OptionInfo(False, "Save a copy of image before applying color correction to img2img results"),
-    "save_mask": OptionInfo(False, "For inpainting, save a copy of the greyscale mask"),
-    "save_mask_composite": OptionInfo(False, "For inpainting, save a masked composite"),
-    "jpeg_quality": OptionInfo(80, "Quality for saved jpeg images", gr.Slider, {"minimum": 1, "maximum": 100, "step": 1}),
-    "webp_lossless": OptionInfo(False, "Use lossless compression for webp images"),
-    "export_for_4chan": OptionInfo(True, "Save copy of large images as JPG").info("if the file size is above the limit, or either width or height are above the limit"),
-    "img_downscale_threshold": OptionInfo(4.0, "File size limit for the above option, MB", gr.Number),
-    "target_side_length": OptionInfo(4000, "Width/height limit for the above option, in pixels", gr.Number),
-    "img_max_size_mp": OptionInfo(200, "Maximum image size", gr.Number).info("in megapixels"),
-
-    "use_original_name_batch": OptionInfo(True, "Use original name for output filename during batch process in extras tab"),
-    "use_upscaler_name_as_suffix": OptionInfo(False, "Use upscaler name as filename suffix in the extras tab"),
-    "save_selected_only": OptionInfo(True, "When using 'Save' button, only save a single selected image"),
-    "save_init_img": OptionInfo(False, "Save init images when using img2img"),
-
-    "temp_dir":  OptionInfo("", "Directory for temporary images; leave empty for default"),
-    "clean_temp_dir_at_start": OptionInfo(False, "Cleanup non-default temporary directory when starting webui"),
-
-    "save_incomplete_images": OptionInfo(False, "Save incomplete images").info("save images that has been interrupted in mid-generation; even if not saved, they will still show up in webui output."),
-
-    "notification_audio": OptionInfo(True, "Play notification sound after image generation").info("notification.mp3 should be present in the root directory").needs_reload_ui(),
-    "notification_volume": OptionInfo(100, "Notification sound volume", gr.Slider, {"minimum": 0, "maximum": 100, "step": 1}).info("in %"),
-}))
+options_templates.update(
+    options_section(
+        ('saving-images', "Saving images/grids"),
+        {"samples_save": OptionInfo(True, "Always save all generated images"),
+         "samples_format": OptionInfo('png', 'File format for images'),
+         "samples_filename_pattern": OptionInfo("", "Images filename pattern", component_args=hide_dirs).link(
+             "wiki", "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Custom-Images-Filename-Name-and-Subdirectory"),
+         "save_images_add_number": OptionInfo(True, "Add number to filename when saving", component_args=hide_dirs),
+         "save_images_replace_action": OptionInfo("Replace", "Saving the image to an existing file", gr.Radio, {"choices": ["Replace", "Add number suffix"],
+                                                                                                                **hide_dirs}),
+         "grid_save": OptionInfo(True, "Always save all generated image grids"),
+         "grid_format": OptionInfo('png', 'File format for grids'),
+         "grid_extended_filename": OptionInfo(False, "Add extended info (seed, prompt) to filename when saving grid"),
+         "grid_only_if_multiple": OptionInfo(True, "Do not save grids consisting of one picture"),
+         "grid_prevent_empty_spots": OptionInfo(False, "Prevent empty spots in grid (when set to autodetect)"),
+         "grid_zip_filename_pattern": OptionInfo("", "Archive filename pattern", component_args=hide_dirs).link(
+             "wiki", "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Custom-Images-Filename-Name-and-Subdirectory"),
+         "n_rows": OptionInfo(-1, "Grid row count; use -1 for autodetect and 0 for it to be same as batch size", gr.Slider, {"minimum": -1, "maximum": 16, "step": 1}),
+         "font": OptionInfo("", "Font for image grids that have text"),
+         "grid_text_active_color": OptionInfo("#000000", "Text color for image grids", ui_components.FormColorPicker, {}),
+         "grid_text_inactive_color": OptionInfo("#999999", "Inactive text color for image grids", ui_components.FormColorPicker, {}),
+         "grid_background_color": OptionInfo("#ffffff", "Background color for image grids", ui_components.FormColorPicker, {}),
+         "enable_pnginfo": OptionInfo(True, "Save text information about generation parameters as chunks to png files"),
+         "save_txt": OptionInfo(False, "Create a text file next to every image with generation parameters."),
+         "save_images_before_face_restoration": OptionInfo(False, "Save a copy of image before doing face restoration."),
+         "save_images_before_highres_fix": OptionInfo(False, "Save a copy of image before applying highres fix."),
+         "save_images_before_color_correction": OptionInfo(False, "Save a copy of image before applying color correction to img2img results"),
+         "save_mask": OptionInfo(False, "For inpainting, save a copy of the greyscale mask"),
+         "save_mask_composite": OptionInfo(False, "For inpainting, save a masked composite"),
+         "jpeg_quality": OptionInfo(80, "Quality for saved jpeg images", gr.Slider, {"minimum": 1, "maximum": 100, "step": 1}),
+         "webp_lossless": OptionInfo(False, "Use lossless compression for webp images"),
+         "export_for_4chan": OptionInfo(True, "Save copy of large images as JPG").info("if the file size is above the limit, or either width or height are above the limit"),
+         "img_downscale_threshold": OptionInfo(4.0, "File size limit for the above option, MB", gr.Number),
+         "target_side_length": OptionInfo(4000, "Width/height limit for the above option, in pixels", gr.Number),
+         "img_max_size_mp": OptionInfo(200, "Maximum image size", gr.Number).info("in megapixels"),
+         "use_original_name_batch": OptionInfo(True, "Use original name for output filename during batch process in extras tab"),
+         "use_upscaler_name_as_suffix": OptionInfo(False, "Use upscaler name as filename suffix in the extras tab"),
+         "save_selected_only": OptionInfo(True, "When using 'Save' button, only save a single selected image"),
+         "save_init_img": OptionInfo(False, "Save init images when using img2img"),
+         "temp_dir": OptionInfo("", "Directory for temporary images; leave empty for default"),
+         "clean_temp_dir_at_start": OptionInfo(False, "Cleanup non-default temporary directory when starting webui"),
+         "save_incomplete_images": OptionInfo(False, "Save incomplete images").info(
+             "save images that has been interrupted in mid-generation; even if not saved, they will still show up in webui output."),
+         "notification_audio": OptionInfo(True,
+                                          "Play notification sound after image generation").info("notification.mp3 should be present in the root directory").needs_reload_ui(),
+         "notification_volume": OptionInfo(100, "Notification sound volume", gr.Slider, {"minimum": 0, "maximum": 100, "step": 1}).info("in %"), }))
 
 options_templates.update(options_section(('saving-paths', "Paths for saving"), {
     "outdir_samples": OptionInfo("", "Output directory for images; if empty, defaults to three directories below", component_args=hide_dirs),
@@ -79,20 +80,27 @@ options_templates.update(options_section(('saving-paths', "Paths for saving"), {
     "outdir_init_images": OptionInfo("outputs/init-images", "Directory for saving init images when using img2img", component_args=hide_dirs),
 }))
 
-options_templates.update(options_section(('saving-to-dirs', "Saving to a directory"), {
-    "save_to_dirs": OptionInfo(True, "Save images to a subdirectory"),
-    "grid_save_to_dirs": OptionInfo(True, "Save grids to a subdirectory"),
-    "use_save_to_dirs_for_ui": OptionInfo(False, "When using \"Save\" button, save images to a subdirectory"),
-    "directories_filename_pattern": OptionInfo("[date]", "Directory name pattern", component_args=hide_dirs).link("wiki", "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Custom-Images-Filename-Name-and-Subdirectory"),
-    "directories_max_prompt_words": OptionInfo(8, "Max prompt words for [prompt_words] pattern", gr.Slider, {"minimum": 1, "maximum": 20, "step": 1, **hide_dirs}),
-}))
+options_templates.update(
+    options_section(
+        ('saving-to-dirs', "Saving to a directory"),
+        {"save_to_dirs": OptionInfo(True, "Save images to a subdirectory"),
+         "grid_save_to_dirs": OptionInfo(True, "Save grids to a subdirectory"),
+         "use_save_to_dirs_for_ui": OptionInfo(False, "When using \"Save\" button, save images to a subdirectory"),
+         "directories_filename_pattern": OptionInfo("[date]", "Directory name pattern", component_args=hide_dirs).link(
+             "wiki", "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Custom-Images-Filename-Name-and-Subdirectory"),
+         "directories_max_prompt_words": OptionInfo(8, "Max prompt words for [prompt_words] pattern", gr.Slider, {"minimum": 1, "maximum": 20, "step": 1, **hide_dirs}), }))
 
-options_templates.update(options_section(('upscaling', "Upscaling"), {
-    "ESRGAN_tile": OptionInfo(192, "Tile size for ESRGAN upscalers.", gr.Slider, {"minimum": 0, "maximum": 512, "step": 16}).info("0 = no tiling"),
-    "ESRGAN_tile_overlap": OptionInfo(8, "Tile overlap for ESRGAN upscalers.", gr.Slider, {"minimum": 0, "maximum": 48, "step": 1}).info("Low values = visible seam"),
-    "realesrgan_enabled_models": OptionInfo(["R-ESRGAN 4x+", "R-ESRGAN 4x+ Anime6B"], "Select which Real-ESRGAN models to show in the web UI.", gr.CheckboxGroup, lambda: {"choices": shared_items.realesrgan_models_names()}),
-    "upscaler_for_img2img": OptionInfo(None, "Upscaler for img2img", gr.Dropdown, lambda: {"choices": [x.name for x in shared.sd_upscalers]}),
-}))
+options_templates.update(
+    options_section(
+        ('upscaling', "Upscaling"),
+        {"ESRGAN_tile": OptionInfo(192, "Tile size for ESRGAN upscalers.", gr.Slider, {"minimum": 0, "maximum": 512, "step": 16}).info("0 = no tiling"),
+         "ESRGAN_tile_overlap": OptionInfo(8, "Tile overlap for ESRGAN upscalers.", gr.Slider, {"minimum": 0, "maximum": 48, "step": 1}).info(
+            "Low values = visible seam"),
+         "realesrgan_enabled_models":
+         OptionInfo(
+            ["R-ESRGAN 4x+", "R-ESRGAN 4x+ Anime6B"],
+            "Select which Real-ESRGAN models to show in the web UI.", gr.CheckboxGroup, lambda: {"choices": shared_items.realesrgan_models_names()}),
+         "upscaler_for_img2img": OptionInfo(None, "Upscaler for img2img", gr.Dropdown, lambda: {"choices": [x.name for x in shared.sd_upscalers]}), }))
 
 options_templates.update(options_section(('face-restoration', "Face restoration"), {
     "face_restoration": OptionInfo(False, "Restore faces", infotext='Face restoration').info("will use a third-party model on generation result to reconstruct faces"),
@@ -137,22 +145,38 @@ options_templates.update(options_section(('training', "Training"), {
     "training_tensorboard_flush_every": OptionInfo(120, "How often, in seconds, to flush the pending tensorboard events and summaries to disk."),
 }))
 
-options_templates.update(options_section(('sd', "Stable Diffusion"), {
-    "sd_model_checkpoint": OptionInfo(None, "Stable Diffusion checkpoint", gr.Dropdown, lambda: {"choices": shared_items.list_checkpoint_tiles(shared.opts.sd_checkpoint_dropdown_use_short)}, refresh=shared_items.refresh_checkpoints, infotext='Model hash'),
-    "sd_checkpoints_limit": OptionInfo(1, "Maximum number of checkpoints loaded at the same time", gr.Slider, {"minimum": 1, "maximum": 10, "step": 1}),
-    "sd_checkpoints_keep_in_cpu": OptionInfo(True, "Only keep one model on device").info("will keep models other than the currently used one in RAM rather than VRAM"),
-    "sd_checkpoint_cache": OptionInfo(0, "Checkpoints to cache in RAM", gr.Slider, {"minimum": 0, "maximum": 10, "step": 1}).info("obsolete; set to 0 and use the two settings above instead"),
-    "sd_unet": OptionInfo("Automatic", "SD Unet", gr.Dropdown, lambda: {"choices": shared_items.sd_unet_items()}, refresh=shared_items.refresh_unet_list).info("choose Unet model: Automatic = use one with same filename as checkpoint; None = use Unet from checkpoint"),
-    "enable_quantization": OptionInfo(False, "Enable quantization in K samplers for sharper and cleaner results. This may change existing seeds").needs_reload_ui(),
-    "enable_emphasis": OptionInfo(True, "Enable emphasis").info("use (text) to make model pay more attention to text and [text] to make it pay less attention"),
-    "enable_batch_seeds": OptionInfo(True, "Make K-diffusion samplers produce same images in a batch as when making a single image"),
-    "comma_padding_backtrack": OptionInfo(20, "Prompt word wrap length limit", gr.Slider, {"minimum": 0, "maximum": 74, "step": 1}).info("in tokens - for texts shorter than specified, if they don't fit into 75 token limit, move them to the next 75 token chunk"),
-    "CLIP_stop_at_last_layers": OptionInfo(1, "Clip skip", gr.Slider, {"minimum": 1, "maximum": 12, "step": 1}, infotext="Clip skip").link("wiki", "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Features#clip-skip").info("ignore last layers of CLIP network; 1 ignores none, 2 ignores one layer"),
-    "upcast_attn": OptionInfo(False, "Upcast cross attention layer to float32"),
-    "randn_source": OptionInfo("GPU", "Random number generator source.", gr.Radio, {"choices": ["GPU", "CPU", "NV"]}, infotext="RNG").info("changes seeds drastically; use CPU to produce the same picture across different videocard vendors; use NV to produce same picture as on NVidia videocards"),
-    "tiling": OptionInfo(False, "Tiling", infotext='Tiling').info("produce a tileable picture"),
-    "hires_fix_refiner_pass": OptionInfo("second pass", "Hires fix: which pass to enable refiner for", gr.Radio, {"choices": ["first pass", "second pass", "both passes"]}, infotext="Hires refiner"),
-}))
+options_templates.update(
+    options_section(
+        ('sd', "Stable Diffusion"),
+        {
+            "sd_model_checkpoint":
+            OptionInfo(
+                None, "Stable Diffusion checkpoint", gr.Dropdown, lambda: {"choices": shared_items.list_checkpoint_tiles(shared.opts.sd_checkpoint_dropdown_use_short)},
+                refresh=shared_items.refresh_checkpoints, infotext='Model hash'),
+            "sd_checkpoints_limit": OptionInfo(1, "Maximum number of checkpoints loaded at the same time", gr.Slider, {"minimum": 1, "maximum": 10, "step": 1}),
+            "sd_checkpoints_keep_in_cpu": OptionInfo(True, "Only keep one model on device").info("will keep models other than the currently used one in RAM rather than VRAM"),
+            "sd_checkpoint_cache": OptionInfo(0, "Checkpoints to cache in RAM", gr.Slider, {"minimum": 0, "maximum": 10, "step": 1}).info(
+                "obsolete; set to 0 and use the two settings above instead"),
+            "sd_unet": OptionInfo("Automatic", "SD Unet", gr.Dropdown, lambda: {"choices": shared_items.sd_unet_items()},
+                                  refresh=shared_items.refresh_unet_list).info(
+                "choose Unet model: Automatic = use one with same filename as checkpoint; None = use Unet from checkpoint"),
+            "enable_quantization": OptionInfo(False, "Enable quantization in K samplers for sharper and cleaner results. This may change existing seeds").needs_reload_ui(),
+            "enable_emphasis": OptionInfo(True, "Enable emphasis").info("use (text) to make model pay more attention to text and [text] to make it pay less attention"),
+            "enable_batch_seeds": OptionInfo(True, "Make K-diffusion samplers produce same images in a batch as when making a single image"),
+            "comma_padding_backtrack": OptionInfo(20, "Prompt word wrap length limit", gr.Slider, {"minimum": 0, "maximum": 74, "step": 1}).info(
+                "in tokens - for texts shorter than specified, if they don't fit into 75 token limit, move them to the next 75 token chunk"),
+            "CLIP_stop_at_last_layers": OptionInfo(1, "Clip skip", gr.Slider, {"minimum": 1, "maximum": 12, "step": 1},
+                                                   infotext="Clip skip").link("wiki", "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Features#clip-skip").info(
+                "ignore last layers of CLIP network; 1 ignores none, 2 ignores one layer"),
+            "upcast_attn": OptionInfo(False, "Upcast cross attention layer to float32"),
+            "randn_source": OptionInfo("GPU", "Random number generator source.", gr.Radio, {"choices": ["GPU", "CPU", "NV"]},
+                                       infotext="RNG").info(
+                "changes seeds drastically; use CPU to produce the same picture across different videocard vendors; use NV to produce same picture as on NVidia videocards"),
+            "tiling": OptionInfo(False, "Tiling", infotext='Tiling').info("produce a tileable picture"),
+            "hires_fix_refiner_pass":
+            OptionInfo(
+                "second pass", "Hires fix: which pass to enable refiner for", gr.Radio, {"choices": ["first pass", "second pass", "both passes"]},
+                infotext="Hires refiner"), }))
 
 options_templates.update(options_section(('sdxl', "Stable Diffusion XL"), {
     "sdxl_crop_top": OptionInfo(0, "crop top coordinate"),
@@ -202,15 +226,18 @@ options_templates.update(options_section(('optimizations', "Optimizations"), {
     "batch_cond_uncond": OptionInfo(True, "Batch cond/uncond").info("do both conditional and unconditional denoising in one batch; uses a bit more VRAM during sampling, but improves speed; previously this was controlled by --always-batch-cond-uncond comandline argument"),
 }))
 
-options_templates.update(options_section(('compatibility', "Compatibility"), {
-    "use_old_emphasis_implementation": OptionInfo(False, "Use old emphasis implementation. Can be useful to reproduce old seeds."),
-    "use_old_karras_scheduler_sigmas": OptionInfo(False, "Use old karras scheduler sigmas (0.1 to 10)."),
-    "no_dpmpp_sde_batch_determinism": OptionInfo(False, "Do not make DPM++ SDE deterministic across different batch sizes."),
-    "use_old_hires_fix_width_height": OptionInfo(False, "For hires fix, use width/height sliders to set final resolution rather than first pass (disables Upscale by, Resize width/height to)."),
-    "dont_fix_second_order_samplers_schedule": OptionInfo(False, "Do not fix prompt schedule for second order samplers."),
-    "hires_fix_use_firstpass_conds": OptionInfo(False, "For hires fix, calculate conds of second pass using extra networks of first pass."),
-    "use_old_scheduling": OptionInfo(False, "Use old prompt editing timelines.", infotext="Old prompt editing timelines").info("For [red:green:N]; old: If N < 1, it's a fraction of steps (and hires fix uses range from 0 to 1), if N >= 1, it's an absolute number of steps; new: If N has a decimal point in it, it's a fraction of steps (and hires fix uses range from 1 to 2), othewrwise it's an absolute number of steps"),
-}))
+options_templates.update(
+    options_section(
+        ('compatibility', "Compatibility"),
+        {"use_old_emphasis_implementation": OptionInfo(False, "Use old emphasis implementation. Can be useful to reproduce old seeds."),
+         "use_old_karras_scheduler_sigmas": OptionInfo(False, "Use old karras scheduler sigmas (0.1 to 10)."),
+         "no_dpmpp_sde_batch_determinism": OptionInfo(False, "Do not make DPM++ SDE deterministic across different batch sizes."),
+         "use_old_hires_fix_width_height":
+         OptionInfo(False, "For hires fix, use width/height sliders to set final resolution rather than first pass (disables Upscale by, Resize width/height to)."),
+         "dont_fix_second_order_samplers_schedule": OptionInfo(False, "Do not fix prompt schedule for second order samplers."),
+         "hires_fix_use_firstpass_conds": OptionInfo(False, "For hires fix, calculate conds of second pass using extra networks of first pass."),
+         "use_old_scheduling": OptionInfo(False, "Use old prompt editing timelines.", infotext="Old prompt editing timelines").info(
+             "For [red:green:N]; old: If N < 1, it's a fraction of steps (and hires fix uses range from 0 to 1), if N >= 1, it's an absolute number of steps; new: If N has a decimal point in it, it's a fraction of steps (and hires fix uses range from 1 to 2), othewrwise it's an absolute number of steps"), }))
 
 options_templates.update(options_section(('interrogate', "Interrogate"), {
     "interrogate_keep_models_in_memory": OptionInfo(False, "Keep models in VRAM"),
@@ -227,22 +254,28 @@ options_templates.update(options_section(('interrogate', "Interrogate"), {
     "deepbooru_filter_tags": OptionInfo("", "deepbooru: filter out those tags").info("separate by comma"),
 }))
 
-options_templates.update(options_section(('extra_networks', "Extra Networks"), {
-    "extra_networks_show_hidden_directories": OptionInfo(True, "Show hidden directories").info("directory is hidden if its name starts with \".\"."),
-    "extra_networks_hidden_models": OptionInfo("When searched", "Show cards for models in hidden directories", gr.Radio, {"choices": ["Always", "When searched", "Never"]}).info('"When searched" option will only show the item when the search string has 4 characters or more'),
-    "extra_networks_default_multiplier": OptionInfo(1.0, "Default multiplier for extra networks", gr.Slider, {"minimum": 0.0, "maximum": 2.0, "step": 0.01}),
-    "extra_networks_card_width": OptionInfo(0, "Card width for Extra Networks").info("in pixels"),
-    "extra_networks_card_height": OptionInfo(0, "Card height for Extra Networks").info("in pixels"),
-    "extra_networks_card_text_scale": OptionInfo(1.0, "Card text scale", gr.Slider, {"minimum": 0.0, "maximum": 2.0, "step": 0.01}).info("1 = original size"),
-    "extra_networks_card_show_desc": OptionInfo(True, "Show description on card"),
-    "extra_networks_card_order_field": OptionInfo("Name", "Default order field for Extra Networks cards", gr.Dropdown, {"choices": ['Name', 'Date Created', 'Date Modified']}).needs_reload_ui(),
-    "extra_networks_card_order": OptionInfo("Ascending", "Default order for Extra Networks cards", gr.Dropdown, {"choices": ['Ascending', 'Descending']}).needs_reload_ui(),
-    "extra_networks_add_text_separator": OptionInfo(" ", "Extra networks separator").info("extra text to add before <...> when adding extra network to prompt"),
-    "ui_extra_networks_tab_reorder": OptionInfo("", "Extra networks tab order").needs_reload_ui(),
-    "textual_inversion_print_at_load": OptionInfo(False, "Print a list of Textual Inversion embeddings when loading model"),
-    "textual_inversion_add_hashes_to_infotext": OptionInfo(True, "Add Textual Inversion hashes to infotext"),
-    "sd_hypernetwork": OptionInfo("None", "Add hypernetwork to prompt", gr.Dropdown, lambda: {"choices": ["None", *shared.hypernetworks]}, refresh=shared_items.reload_hypernetworks),
-}))
+options_templates.update(
+    options_section(
+        ('extra_networks', "Extra Networks"),
+        {"extra_networks_show_hidden_directories": OptionInfo(True, "Show hidden directories").info("directory is hidden if its name starts with \".\"."),
+         "extra_networks_hidden_models":
+         OptionInfo("When searched", "Show cards for models in hidden directories", gr.Radio, {"choices": ["Always", "When searched", "Never"]}).info(
+             '"When searched" option will only show the item when the search string has 4 characters or more'),
+         "extra_networks_default_multiplier": OptionInfo(1.0, "Default multiplier for extra networks", gr.Slider, {"minimum": 0.0, "maximum": 2.0, "step": 0.01}),
+         "extra_networks_card_width": OptionInfo(0, "Card width for Extra Networks").info("in pixels"),
+         "extra_networks_card_height": OptionInfo(0, "Card height for Extra Networks").info("in pixels"),
+         "extra_networks_card_text_scale": OptionInfo(1.0, "Card text scale", gr.Slider, {"minimum": 0.0, "maximum": 2.0, "step": 0.01}).info("1 = original size"),
+         "extra_networks_card_show_desc": OptionInfo(True, "Show description on card"),
+         "extra_networks_card_order_field":
+         OptionInfo("Name", "Default order field for Extra Networks cards", gr.Dropdown, {"choices": ['Name', 'Date Created', 'Date Modified']}).needs_reload_ui(),
+         "extra_networks_card_order": OptionInfo("Ascending", "Default order for Extra Networks cards", gr.Dropdown, {"choices": ['Ascending', 'Descending']}).needs_reload_ui(),
+         "extra_networks_add_text_separator": OptionInfo(" ", "Extra networks separator").info("extra text to add before <...> when adding extra network to prompt"),
+         "ui_extra_networks_tab_reorder": OptionInfo("", "Extra networks tab order").needs_reload_ui(),
+         "textual_inversion_print_at_load": OptionInfo(False, "Print a list of Textual Inversion embeddings when loading model"),
+         "textual_inversion_add_hashes_to_infotext": OptionInfo(True, "Add Textual Inversion hashes to infotext"),
+         "sd_hypernetwork":
+         OptionInfo("None", "Add hypernetwork to prompt", gr.Dropdown, lambda: {"choices": ["None", *shared.hypernetworks]},
+                    refresh=shared_items.reload_hypernetworks), }))
 
 options_templates.update(options_section(('ui', "User interface"), {
     "localization": OptionInfo("None", "Localization", gr.Dropdown, lambda: {"choices": ["None"] + list(localization.localizations.keys())}, refresh=lambda: localization.list_localizations(cmd_opts.localizations_dir)).needs_reload_ui(),
@@ -277,33 +310,40 @@ options_templates.update(options_section(('ui', "User interface"), {
 }))
 
 
-options_templates.update(options_section(('infotext', "Infotext"), {
-    "add_model_hash_to_info": OptionInfo(True, "Add model hash to generation information"),
-    "add_model_name_to_info": OptionInfo(True, "Add model name to generation information"),
-    "add_user_name_to_info": OptionInfo(False, "Add user name to generation information when authenticated"),
-    "add_version_to_infotext": OptionInfo(True, "Add program version to generation information"),
-    "disable_weights_auto_swap": OptionInfo(True, "Disregard checkpoint information from pasted infotext").info("when reading generation parameters from text into UI"),
-    "infotext_styles": OptionInfo("Apply if any", "Infer styles from prompts of pasted infotext", gr.Radio, {"choices": ["Ignore", "Apply", "Discard", "Apply if any"]}).info("when reading generation parameters from text into UI)").html("""<ul style='margin-left: 1.5em'>
+options_templates.update(
+    options_section(
+        ('infotext', "Infotext"),
+        {"add_model_hash_to_info": OptionInfo(True, "Add model hash to generation information"),
+         "add_model_name_to_info": OptionInfo(True, "Add model name to generation information"),
+         "add_user_name_to_info": OptionInfo(False, "Add user name to generation information when authenticated"),
+         "add_version_to_infotext": OptionInfo(True, "Add program version to generation information"),
+         "disable_weights_auto_swap": OptionInfo(True, "Disregard checkpoint information from pasted infotext").info("when reading generation parameters from text into UI"),
+         "infotext_styles":
+         OptionInfo("Apply if any", "Infer styles from prompts of pasted infotext", gr.Radio, {"choices": ["Ignore", "Apply", "Discard", "Apply if any"]}).info(
+             "when reading generation parameters from text into UI)").html(
+             """<ul style='margin-left: 1.5em'>
 <li>Ignore: keep prompt and styles dropdown as it is.</li>
 <li>Apply: remove style text from prompt, always replace styles dropdown value with found styles (even if none are found).</li>
 <li>Discard: remove style text from prompt, keep styles dropdown as it is.</li>
 <li>Apply if any: remove style text from prompt; if any styles are found in prompt, put them into styles dropdown, otherwise keep it as it is.</li>
-</ul>"""),
+</ul>"""), }))
 
-}))
-
-options_templates.update(options_section(('ui', "Live previews"), {
-    "show_progressbar": OptionInfo(True, "Show progressbar"),
-    "live_previews_enable": OptionInfo(True, "Show live previews of the created image"),
-    "live_previews_image_format": OptionInfo("png", "Live preview file format", gr.Radio, {"choices": ["jpeg", "png", "webp"]}),
-    "show_progress_grid": OptionInfo(True, "Show previews of all images generated in a batch as a grid"),
-    "show_progress_every_n_steps": OptionInfo(10, "Live preview display period", gr.Slider, {"minimum": -1, "maximum": 32, "step": 1}).info("in sampling steps - show new live preview image every N sampling steps; -1 = only show after completion of batch"),
-    "show_progress_type": OptionInfo("Approx NN", "Live preview method", gr.Radio, {"choices": ["Full", "Approx NN", "Approx cheap", "TAESD"]}).info("Full = slow but pretty; Approx NN and TAESD = fast but low quality; Approx cheap = super fast but terrible otherwise"),
-    "live_preview_allow_lowvram_full": OptionInfo(False, "Allow Full live preview method with lowvram/medvram").info("If not, Approx NN will be used instead; Full live preview method is very detrimental to speed if lowvram/medvram optimizations are enabled"),
-    "live_preview_content": OptionInfo("Prompt", "Live preview subject", gr.Radio, {"choices": ["Combined", "Prompt", "Negative prompt"]}),
-    "live_preview_refresh_period": OptionInfo(1000, "Progressbar and preview update period").info("in milliseconds"),
-    "live_preview_fast_interrupt": OptionInfo(False, "Return image with chosen live preview method on interrupt").info("makes interrupts faster"),
-}))
+options_templates.update(
+    options_section(
+        ('ui', "Live previews"),
+        {"show_progressbar": OptionInfo(True, "Show progressbar"),
+         "live_previews_enable": OptionInfo(True, "Show live previews of the created image"),
+         "live_previews_image_format": OptionInfo("png", "Live preview file format", gr.Radio, {"choices": ["jpeg", "png", "webp"]}),
+         "show_progress_grid": OptionInfo(True, "Show previews of all images generated in a batch as a grid"),
+         "show_progress_every_n_steps": OptionInfo(10, "Live preview display period", gr.Slider, {"minimum": -1, "maximum": 32, "step": 1}).info(
+             "in sampling steps - show new live preview image every N sampling steps; -1 = only show after completion of batch"),
+         "show_progress_type": OptionInfo("Approx NN", "Live preview method", gr.Radio, {"choices": ["Full", "Approx NN", "Approx cheap", "TAESD"]}).info(
+             "Full = slow but pretty; Approx NN and TAESD = fast but low quality; Approx cheap = super fast but terrible otherwise"),
+         "live_preview_allow_lowvram_full": OptionInfo(False, "Allow Full live preview method with lowvram/medvram").info(
+             "If not, Approx NN will be used instead; Full live preview method is very detrimental to speed if lowvram/medvram optimizations are enabled"),
+         "live_preview_content": OptionInfo("Prompt", "Live preview subject", gr.Radio, {"choices": ["Combined", "Prompt", "Negative prompt"]}),
+         "live_preview_refresh_period": OptionInfo(1000, "Progressbar and preview update period").info("in milliseconds"),
+         "live_preview_fast_interrupt": OptionInfo(False, "Return image with chosen live preview method on interrupt").info("makes interrupts faster"), }))
 
 options_templates.update(options_section(('sampler-params', "Sampler parameters"), {
     "hide_samplers": OptionInfo([], "Hide samplers in user interface", gr.CheckboxGroup, lambda: {"choices": [x.name for x in shared_items.list_samplers()]}).needs_reload_ui(),
