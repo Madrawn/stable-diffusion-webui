@@ -91,8 +91,8 @@ def create_binary_mask(image):
 def txt2img_image_conditioning(sd_model, x, width, height):
     if sd_model.model.conditioning_key in {'hybrid', 'concat'}: # Inpainting models
 
-        # The "masked-image" in this case will just be all zeros since the entire image is masked.
-        image_conditioning = torch.zeros(x.shape[0], 3, height, width, device=x.device)
+        # The "masked-image" in this case will just be all 0.5 since the entire image is masked.
+        image_conditioning = torch.ones(x.shape[0], 3, height, width, device=x.device) * 0.5
         image_conditioning = images_tensor_to_samples(image_conditioning, approximation_indexes.get(opts.sd_vae_encode_method))
 
         # Add the fake full 1s mask to the first dimension.
@@ -142,7 +142,7 @@ class StableDiffusionProcessing:
     overlay_images: list = None
     eta: float = None
     do_not_reload_embeddings: bool = False
-    denoising_strength: float = 0
+    denoising_strength: float = None
     ddim_discretize: str = None
     s_min_uncond: float = None
     s_churn: float = None
@@ -296,7 +296,7 @@ class StableDiffusionProcessing:
         return conditioning
 
     def edit_image_conditioning(self, source_image):
-        conditioning_image = images_tensor_to_samples(source_image*0.5+0.5, approximation_indexes.get(opts.sd_vae_encode_method))
+        conditioning_image = shared.sd_model.encode_first_stage(source_image).mode()
 
         return conditioning_image
 
@@ -533,6 +533,7 @@ class Processed:
         self.all_seeds = all_seeds or p.all_seeds or [self.seed]
         self.all_subseeds = all_subseeds or p.all_subseeds or [self.subseed]
         self.infotexts = infotexts or [info]
+        self.version = program_version()
 
     def js(self):
         obj = {
@@ -567,6 +568,7 @@ class Processed:
             "job_timestamp": self.job_timestamp,
             "clip_skip": self.clip_skip,
             "is_using_inpainting_conditioning": self.is_using_inpainting_conditioning,
+            "version": self.version,
         }
 
         return json.dumps(obj)
@@ -709,7 +711,7 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
     if p.scripts is not None:
         p.scripts.before_process(p)
 
-    stored_opts = {k: opts.data[k] for k in p.override_settings.keys()}
+    stored_opts = {k: opts.data[k] if k in opts.data else opts.get_default(k) for k in p.override_settings.keys() if k in opts.data}
 
     try:
         # if no checkpoint override or the override checkpoint can't be found, remove override entry and load opts checkpoint
@@ -884,6 +886,8 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
 
             devices.torch_gc()
 
+            state.nextjob()
+
             if p.scripts is not None:
                 p.scripts.postprocess_batch(p, x_samples_ddim, batch_number=n)
 
@@ -956,7 +960,8 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
 
             devices.torch_gc()
 
-            state.nextjob()
+        if not infotexts:
+            infotexts.append(Processed(p, []).infotext(p, 0))
 
         p.color_corrections = None
 
@@ -1148,18 +1153,12 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
         else:
             decoded_samples = None
 
-        current = shared.sd_model.sd_checkpoint_info
-        try:
-            if self.hr_checkpoint_info is not None:
-                self.sampler = None
-                sd_models.reload_model_weights(info=self.hr_checkpoint_info)
-                devices.torch_gc()
+        with sd_models.SkipWritingToConfig():
+            sd_models.reload_model_weights(info=self.hr_checkpoint_info)
 
-            return self.sample_hr_pass(samples, decoded_samples, seeds, subseeds, subseed_strength, prompts)
-        finally:
-            self.sampler = None
-            sd_models.reload_model_weights(info=current)
-            devices.torch_gc()
+        devices.torch_gc()
+
+        return self.sample_hr_pass(samples, decoded_samples, seeds, subseeds, subseed_strength, prompts)
 
     def sample_hr_pass(self, samples, decoded_samples, seeds, subseeds, subseed_strength, prompts):
         if shared.state.interrupted:
@@ -1321,7 +1320,7 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
             if shared.opts.hires_fix_use_firstpass_conds:
                 self.calculate_hr_conds()
 
-            elif lowvram.is_enabled(shared.sd_model):  # if in lowvram mode, we need to calculate conds right away, before the cond NN is unloaded
+            elif lowvram.is_enabled(shared.sd_model) and shared.sd_model.sd_checkpoint_info == sd_models.select_checkpoint():  # if in lowvram mode, we need to calculate conds right away, before the cond NN is unloaded
                 with devices.autocast():
                     extra_networks.activate(self, self.hr_extra_network_data)
 
