@@ -5,7 +5,7 @@ import random
 import csv
 import os.path
 from io import StringIO
-from PIL import Image
+from PIL import Image, ImageDraw
 import numpy as np
 
 import modules.scripts as scripts
@@ -239,10 +239,18 @@ axis_options = [
     AxisOptionImg2Img("Image CFG Scale", float, apply_field("image_cfg_scale")),
     AxisOption("Prompt S/R", str, apply_prompt, format_value=format_value),
     AxisOption("Prompt order", str_permutations, apply_order, format_value=format_value_join_list),
-    AxisOptionTxt2Img("Sampler", str, apply_field("sampler_name"), format_value=format_value, confirm=confirm_samplers, choices=lambda: [x.name for x in sd_samplers.samplers if x.name not in opts.hide_samplers]),
-    AxisOptionTxt2Img("Hires sampler", str, apply_field("hr_sampler_name"), confirm=confirm_samplers, choices=lambda: [x.name for x in sd_samplers.samplers_for_img2img if x.name not in opts.hide_samplers]),
-    AxisOptionImg2Img("Sampler", str, apply_field("sampler_name"), format_value=format_value, confirm=confirm_samplers, choices=lambda: [x.name for x in sd_samplers.samplers_for_img2img if x.name not in opts.hide_samplers]),
-    AxisOption("Checkpoint name", str, apply_checkpoint, format_value=format_remove_path, confirm=confirm_checkpoints, cost=1.0, choices=lambda: sorted(sd_models.checkpoints_list, key=str.casefold)),
+    AxisOptionTxt2Img(
+        "Sampler", str, apply_field("sampler_name"),
+        format_value=format_value, confirm=confirm_samplers, choices=lambda: [x.name for x in sd_samplers.samplers if x.name not in opts.hide_samplers]),
+    AxisOptionTxt2Img(
+        "Hires sampler", str, apply_field("hr_sampler_name"),
+        confirm=confirm_samplers, choices=lambda: [x.name for x in sd_samplers.samplers_for_img2img if x.name not in opts.hide_samplers]),
+    AxisOptionImg2Img(
+        "Sampler", str, apply_field("sampler_name"),
+        format_value=format_value, confirm=confirm_samplers, choices=lambda: [x.name for x in sd_samplers.samplers_for_img2img if x.name not in opts.hide_samplers]),
+    AxisOption(
+        "Checkpoint name", str, apply_checkpoint, format_value=format_remove_path, confirm=confirm_checkpoints, cost=1.0,
+        choices=lambda: sorted(sd_models.checkpoints_list, key=str.casefold)),
     AxisOption("Negative Guidance minimum sigma", float, apply_field("s_min_uncond")),
     AxisOption("Sigma Churn", float, apply_field("s_churn")),
     AxisOption("Sigma min", float, apply_field("s_tmin")),
@@ -254,7 +262,8 @@ axis_options = [
     AxisOption("[DPM adaptive] proportional coefficient", float, apply_field("pcoeff")),
     AxisOption("[DPM adaptive] integral coefficient", float, apply_field("icoeff")),
     AxisOption("[DPM adaptive] derivative coefficient", float, apply_field("dcoeff")),
-    AxisOption("Schedule type", str, apply_override("k_sched_type"), choices=lambda: list(sd_samplers_kdiffusion.k_diffusion_scheduler)),
+    AxisOption("Schedule type", str, apply_override("k_sched_type"),
+               choices=lambda: list(sd_samplers_kdiffusion.k_diffusion_scheduler)),
     AxisOption("Schedule min sigma", float, apply_override("sigma_min")),
     AxisOption("Schedule max sigma", float, apply_override("sigma_max")),
     AxisOption("Schedule rho", float, apply_override("rho")),
@@ -263,7 +272,8 @@ axis_options = [
     AxisOption("Denoising", float, apply_field("denoising_strength")),
     AxisOption("Initial noise multiplier", float, apply_field("initial_noise_multiplier")),
     AxisOption("Extra noise", float, apply_override("img2img_extra_noise")),
-    AxisOptionTxt2Img("Hires upscaler", str, apply_field("hr_upscaler"), choices=lambda: [*shared.latent_upscale_modes, *[x.name for x in shared.sd_upscalers]]),
+    AxisOptionTxt2Img("Hires upscaler", str, apply_field("hr_upscaler"),
+                      choices=lambda: [*shared.latent_upscale_modes, *[x.name for x in shared.sd_upscalers]]),
     AxisOptionImg2Img("Cond. Image Mask Weight", float, apply_field("inpainting_mask_weight")),
     AxisOption("VAE", str, apply_vae, cost=0.7, choices=lambda: ['None'] + list(sd_vae.vae_dict)),
     AxisOption("Styles", str, apply_styles, choices=lambda: list(shared.prompt_styles.styles)),
@@ -271,12 +281,16 @@ axis_options = [
     AxisOption("Face restore", str, apply_face_restore, format_value=format_value),
     AxisOption("Token merging ratio", float, apply_override('token_merging_ratio')),
     AxisOption("Token merging ratio high-res", float, apply_override('token_merging_ratio_hr')),
-    AxisOption("Always discard next-to-last sigma", str, apply_override('always_discard_next_to_last_sigma', boolean=True), choices=boolean_choice(reverse=True)),
-    AxisOption("SGM noise multiplier", str, apply_override('sgm_noise_multiplier', boolean=True), choices=boolean_choice(reverse=True)),
-    AxisOption("Refiner checkpoint", str, apply_field('refiner_checkpoint'), format_value=format_remove_path, confirm=confirm_checkpoints_or_none, cost=1.0, choices=lambda: ['None'] + sorted(sd_models.checkpoints_list, key=str.casefold)),
+    AxisOption("Always discard next-to-last sigma", str, apply_override('always_discard_next_to_last_sigma', boolean=True),
+               choices=boolean_choice(reverse=True)),
+    AxisOption("SGM noise multiplier", str, apply_override('sgm_noise_multiplier', boolean=True),
+               choices=boolean_choice(reverse=True)),
+    AxisOption(
+        "Refiner checkpoint", str, apply_field('refiner_checkpoint'),
+        format_value=format_remove_path, confirm=confirm_checkpoints_or_none, cost=1.0, choices=lambda: ['None'] + sorted(sd_models.checkpoints_list, key=str.casefold)),
     AxisOption("Refiner switch at", float, apply_field('refiner_switch_at')),
-    AxisOption("RNG source", str, apply_override("randn_source"), choices=lambda: ["GPU", "CPU", "NV"]),
-]
+    AxisOption("RNG source", str, apply_override("randn_source"),
+               choices=lambda: ["GPU", "CPU", "NV"]),]
 
 
 def draw_xyz_grid(p, xs, ys, zs, x_labels, y_labels, z_labels, cell, draw_legend, include_lone_images, include_sub_grids, first_axes_processed, second_axes_processed, margin_size):
@@ -422,19 +436,22 @@ class Script(scripts.Script):
         with gr.Row():
             with gr.Column(scale=19):
                 with gr.Row():
-                    x_type = gr.Dropdown(label="X type", choices=[x.label for x in self.current_axis_options], value=self.current_axis_options[1].label, type="index", elem_id=self.elem_id("x_type"))
+                    x_type = gr.Dropdown(label="X type", choices=[x.label for x in self.current_axis_options],
+                                         value=self.current_axis_options[1].label, type="index", elem_id=self.elem_id("x_type"))
                     x_values = gr.Textbox(label="X values", lines=1, elem_id=self.elem_id("x_values"))
                     x_values_dropdown = gr.Dropdown(label="X values", visible=False, multiselect=True, interactive=True)
                     fill_x_button = ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_x_tool_button", visible=False)
 
                 with gr.Row():
-                    y_type = gr.Dropdown(label="Y type", choices=[x.label for x in self.current_axis_options], value=self.current_axis_options[0].label, type="index", elem_id=self.elem_id("y_type"))
+                    y_type = gr.Dropdown(label="Y type", choices=[x.label for x in self.current_axis_options],
+                                         value=self.current_axis_options[0].label, type="index", elem_id=self.elem_id("y_type"))
                     y_values = gr.Textbox(label="Y values", lines=1, elem_id=self.elem_id("y_values"))
                     y_values_dropdown = gr.Dropdown(label="Y values", visible=False, multiselect=True, interactive=True)
                     fill_y_button = ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_y_tool_button", visible=False)
 
                 with gr.Row():
-                    z_type = gr.Dropdown(label="Z type", choices=[x.label for x in self.current_axis_options], value=self.current_axis_options[0].label, type="index", elem_id=self.elem_id("z_type"))
+                    z_type = gr.Dropdown(label="Z type", choices=[x.label for x in self.current_axis_options],
+                                         value=self.current_axis_options[0].label, type="index", elem_id=self.elem_id("z_type"))
                     z_values = gr.Textbox(label="Z values", lines=1, elem_id=self.elem_id("z_values"))
                     z_values_dropdown = gr.Dropdown(label="Z values", visible=False, multiselect=True, interactive=True)
                     fill_z_button = ToolButton(value=fill_values_symbol, elem_id="xyz_grid_fill_z_tool_button", visible=False)
@@ -450,6 +467,7 @@ class Script(scripts.Script):
                 margin_size = gr.Slider(label="Grid margins (px)", minimum=0, maximum=500, value=0, step=2, elem_id=self.elem_id("margin_size"))
             with gr.Column():
                 csv_mode = gr.Checkbox(label='Use text inputs instead of dropdowns', value=False, elem_id=self.elem_id("csv_mode"))
+                annotate_time = gr.Checkbox(label='Write the time taken per image ontop of them in the grid', value=False, elem_id=self.elem_id("annotate_time"))
 
         with gr.Row(variant="compact", elem_id="swap_axes"):
             swap_xy_axes_button = gr.Button(value="Swap X/Y axes", elem_id="xy_grid_swap_axes_button")
@@ -508,7 +526,8 @@ class Script(scripts.Script):
             _fill_z_button, _z_values, _z_values_dropdown = select_axis(z_type, z_values, z_values_dropdown, csv_mode)
             return _fill_x_button, _x_values, _x_values_dropdown, _fill_y_button, _y_values, _y_values_dropdown, _fill_z_button, _z_values, _z_values_dropdown
 
-        csv_mode.change(fn=change_choice_mode, inputs=[csv_mode, x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown], outputs=[fill_x_button, x_values, x_values_dropdown, fill_y_button, y_values, y_values_dropdown, fill_z_button, z_values, z_values_dropdown])
+        csv_mode.change(fn=change_choice_mode, inputs=[csv_mode, x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown], outputs=[
+                        fill_x_button, x_values, x_values_dropdown, fill_y_button, y_values, y_values_dropdown, fill_z_button, z_values, z_values_dropdown])
 
         def get_dropdown_update_from_params(axis, params):
             val_key = f"{axis} Values"
@@ -528,9 +547,10 @@ class Script(scripts.Script):
             (z_values_dropdown, lambda params: get_dropdown_update_from_params("Z", params)),
         )
 
-        return [x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown, draw_legend, include_lone_images, include_sub_grids, no_fixed_seeds, margin_size, csv_mode]
+        return [x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown, draw_legend, include_lone_images, include_sub_grids, no_fixed_seeds, margin_size, csv_mode, annotate_time]
 
-    def run(self, p, x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown, draw_legend, include_lone_images, include_sub_grids, no_fixed_seeds, margin_size, csv_mode):
+    def run(self, p, x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown, draw_legend, include_lone_images,
+            include_sub_grids, no_fixed_seeds, margin_size, csv_mode, annotate_time):
         if not no_fixed_seeds:
             modules.processing.fix_seed(p)
 
@@ -694,6 +714,7 @@ class Script(scripts.Script):
         grid_infotext = [None] * (1 + len(zs))
 
         def cell(x, y, z, ix, iy, iz):
+            import time
             if shared.state.interrupted:
                 return Processed(p, [], p.seed, "")
 
@@ -702,20 +723,24 @@ class Script(scripts.Script):
             x_opt.apply(pc, x, xs)
             y_opt.apply(pc, y, ys)
             z_opt.apply(pc, z, zs)
-
+            st = time.time()
             try:
                 res = process_images(pc)
+
             except Exception as e:
                 errors.display(e, "generating image for xyz plot")
 
                 res = Processed(p, [], p.seed, "")
 
+            elapsed_time = time.time() - st
+            res.extra_generation_params['elapsed_time'] = f'Execution time: {time.strftime("%H:%M:%S", time.gmtime(elapsed_time))}'
+            if annotate_time:
+                scribble_time(res.images[res.index_of_first_image], res.extra_generation_params['elapsed_time'])
             # Sets subgrid infotexts
             subgrid_index = 1 + iz
             if grid_infotext[subgrid_index] is None and ix == 0 and iy == 0:
                 pc.extra_generation_params = copy(pc.extra_generation_params)
                 pc.extra_generation_params['Script'] = self.title()
-
                 if x_opt.label != 'Nothing':
                     pc.extra_generation_params["X Type"] = x_opt.label
                     pc.extra_generation_params["X Values"] = x_values
@@ -781,7 +806,8 @@ class Script(scripts.Script):
             for g in range(grid_count):
                 # TODO: See previous comment about intentional data misalignment.
                 adj_g = g-1 if g > 0 else g
-                images.save_image(processed.images[g], p.outpath_grids, "xyz_grid", info=processed.infotexts[g], extension=opts.grid_format, prompt=processed.all_prompts[adj_g], seed=processed.all_seeds[adj_g], grid=True, p=processed)
+                images.save_image(processed.images[g], p.outpath_grids, "xyz_grid", info=processed.infotexts[g], extension=opts.grid_format,
+                                  prompt=processed.all_prompts[adj_g], seed=processed.all_seeds[adj_g], grid=True, p=processed)
                 if not include_sub_grids:  # if not include_sub_grids then skip saving after the first grid
                     break
 
@@ -794,3 +820,11 @@ class Script(scripts.Script):
                 del processed.infotexts[1]
 
         return processed
+
+
+def scribble_time(image: Image.Image, txt: str):
+    draw = ImageDraw.Draw(image)
+    fnt = images.get_font(14)
+    box = draw.textbbox((12, 12), txt, font=fnt)
+    draw.rounded_rectangle(box, radius=4, fill="black")
+    draw.text((12, 12), txt, fill="white", font=fnt)
