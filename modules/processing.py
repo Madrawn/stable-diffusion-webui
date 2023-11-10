@@ -155,6 +155,7 @@ class StableDiffusionProcessing:
     pcoeff: float = None
     icoeff: float = None
     dcoeff: float = None
+    accept_safety: float = None
 
     override_settings: dict[str, Any] = None
     override_settings_restore_afterwards: bool = True
@@ -230,6 +231,7 @@ class StableDiffusionProcessing:
         self.pcoeff = self.pcoeff if self.pcoeff is not None else opts.pcoeff
         self.icoeff = self.icoeff if self.icoeff is not None else opts.icoeff
         self.dcoeff = self.dcoeff if self.dcoeff is not None else opts.dcoeff
+        self.accept_safety = self.accept_safety if self.accept_safety is not None else opts.accept_safety
 
         self.extra_generation_params = self.extra_generation_params or {}
         self.override_settings = self.override_settings or {}
