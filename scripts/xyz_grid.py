@@ -1,3 +1,4 @@
+import importlib
 from collections import namedtuple
 from copy import copy
 from itertools import permutations, chain
@@ -253,7 +254,7 @@ class AxisOptionTxt2Img(AxisOption):
         self.is_img2img = False
 
 
-axis_options = [
+axis_options: list[AxisOption | AxisOptionImg2Img | AxisOptionTxt2Img] = [
     AxisOption("Nothing", str, do_nothing, format_value=format_nothing),
     AxisOption("Seed", int, apply_field("seed")),
     AxisOption("Var. seed", int, apply_field("subseed")),
@@ -284,9 +285,15 @@ axis_options = [
     AxisOption("Sigma min", float, apply_field("s_tmin")),
     AxisOption("Sigma max", float, apply_field("s_tmax")),
     AxisOption("Sigma noise", float, apply_field("s_noise")),
-    AxisOption(
-        "Schedule type", str, apply_override("k_sched_type"),
-        choices=lambda: list(sd_samplers_kdiffusion.k_diffusion_scheduler)),
+    AxisOption("[DPM adaptive] relative tolerance", float, apply_field("rtol")),
+    AxisOption("[DPM adaptive] absolute tolerance", float, apply_field("atol")),
+    AxisOption("[DPM adaptive] initial step size", float, apply_field("h_init")),
+    AxisOption("[DPM adaptive] proportional coefficient", float, apply_field("pcoeff")),
+    AxisOption("[DPM adaptive] integral coefficient", float, apply_field("icoeff")),
+    AxisOption("[DPM adaptive] derivative coefficient", float, apply_field("dcoeff")),
+    AxisOption("[DPM adaptive] accept safety factor", float, apply_field("accept_safety")),
+    AxisOption("Schedule type", str, apply_override("k_sched_type"),
+               choices=lambda: list(sd_samplers_kdiffusion.k_diffusion_scheduler)),
     AxisOption("Schedule min sigma", float, apply_override("sigma_min")),
     AxisOption("Schedule max sigma", float, apply_override("sigma_max")),
     AxisOption("Schedule rho", float, apply_override("rho")),
@@ -887,3 +894,30 @@ class Script(scripts.Script):
                 del processed.infotexts[1]
 
         return processed
+
+
+def scribble_time(image: Image.Image, txt: str):
+    draw = ImageDraw.Draw(image)
+    fnt = images.get_font(14)
+    box = draw.textbbox((12, 12), txt, font=fnt)
+    draw.rounded_rectangle(box, radius=4, fill="black")
+    draw.text((12, 12), txt, fill="white", font=fnt)
+
+
+# Verify grid extension is present
+if importlib.util.find_spec("gridgencore") is not None:
+    import gridgencore
+    from gridgencore import GridSettingMode
+    # p is the SD processing object, v is the value
+
+    def apply(p, v):
+        p.some_setting_here = v
+    # dry: bool, type: str, apply: callable, min: float = None, max: float = None, clean: callable = None
+    # for apply if the param is a 'p' field, you can use gridgencore.apply_field("fieldname")
+    for option in axis_options:
+        if (option.label.lower().replace(' ', '').replace('.', '').replace('[', '').replace(']', '').strip()) not in list(gridgencore.valid_modes.keys()):
+            try:
+                typetext = str(option.type).split('\'')[1]
+                gridgencore.registerMode(option.label, GridSettingMode(True, typetext, option.apply))
+            except:
+                pass
