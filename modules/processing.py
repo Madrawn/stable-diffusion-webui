@@ -151,6 +151,14 @@ class StableDiffusionProcessing:
     s_tmax: float = None
     s_tmin: float = None
     s_noise: float = None
+    rtol: float = None
+    atol: float = None
+    h_init: float = None
+    pcoeff: float = None
+    icoeff: float = None
+    dcoeff: float = None
+    accept_safety: float = None
+
     override_settings: dict[str, Any] = None
     override_settings_restore_afterwards: bool = True
     sampler_index: int = None
@@ -221,6 +229,13 @@ class StableDiffusionProcessing:
         self.s_tmin = self.s_tmin if self.s_tmin is not None else opts.s_tmin
         self.s_tmax = (self.s_tmax if self.s_tmax is not None else opts.s_tmax) or float('inf')
         self.s_noise = self.s_noise if self.s_noise is not None else opts.s_noise
+        self.atol = self.atol if self.atol is not None else opts.atol
+        self.rtol = self.rtol if self.rtol is not None else opts.rtol
+        self.h_init = self.h_init if self.h_init is not None else opts.h_init
+        self.pcoeff = self.pcoeff if self.pcoeff is not None else opts.pcoeff
+        self.icoeff = self.icoeff if self.icoeff is not None else opts.icoeff
+        self.dcoeff = self.dcoeff if self.dcoeff is not None else opts.dcoeff
+        self.accept_safety = self.accept_safety if self.accept_safety is not None else opts.accept_safety
 
         self.extra_generation_params = self.extra_generation_params or {}
         self.override_settings = self.override_settings or {}
@@ -1398,7 +1413,6 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
     mask: Any = None
     mask_blur_x: int = 4
     mask_blur_y: int = 4
-    mask_blur: int = None
     inpainting_fill: int = 0
     inpaint_full_res: bool = True
     inpaint_full_res_padding: int = 0

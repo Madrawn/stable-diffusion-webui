@@ -6,7 +6,7 @@ import random
 import csv
 import os.path
 from io import StringIO
-from PIL import Image
+from PIL import Image, ImageDraw
 import numpy as np
 
 import modules.scripts as scripts
@@ -529,8 +529,8 @@ class Script(scripts.Script):
                 margin_size = gr.Slider(label="Grid margins (px)", minimum=0, maximum=500,
                                         value=0, step=2, elem_id=self.elem_id("margin_size"))
             with gr.Column():
-                csv_mode = gr.Checkbox(label='Use text inputs instead of dropdowns',
-                                       value=False, elem_id=self.elem_id("csv_mode"))
+                csv_mode = gr.Checkbox(label='Use text inputs instead of dropdowns', value=False, elem_id=self.elem_id("csv_mode"))
+                annotate_time = gr.Checkbox(label='Write the time taken per image ontop of them in the grid', value=False, elem_id=self.elem_id("annotate_time"))
 
         with gr.Row(variant="compact", elem_id="swap_axes"):
             swap_xy_axes_button = gr.Button(value="Swap X/Y axes", elem_id="xy_grid_swap_axes_button")
@@ -619,12 +619,10 @@ class Script(scripts.Script):
             (z_values_dropdown, lambda params: get_dropdown_update_from_params("Z", params)),
         )
 
-        return [x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown, draw_legend, include_lone_images, include_sub_grids, no_fixed_seeds, margin_size, csv_mode]
+        return [x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown, draw_legend, include_lone_images, include_sub_grids, no_fixed_seeds, margin_size, csv_mode, annotate_time]
 
-    def run(
-            self, p, x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values,
-            z_values_dropdown, draw_legend, include_lone_images, include_sub_grids, no_fixed_seeds, margin_size,
-            csv_mode):
+    def run(self, p, x_type, x_values, x_values_dropdown, y_type, y_values, y_values_dropdown, z_type, z_values, z_values_dropdown, draw_legend, include_lone_images,
+            include_sub_grids, no_fixed_seeds, margin_size, csv_mode, annotate_time):
         if not no_fixed_seeds:
             modules.processing.fix_seed(p)
 
@@ -788,6 +786,7 @@ class Script(scripts.Script):
         grid_infotext = [None] * (1 + len(zs))
 
         def cell(x, y, z, ix, iy, iz):
+            import time
             if shared.state.interrupted:
                 return Processed(p, [], p.seed, "")
 
@@ -796,20 +795,24 @@ class Script(scripts.Script):
             x_opt.apply(pc, x, xs)
             y_opt.apply(pc, y, ys)
             z_opt.apply(pc, z, zs)
-
+            st = time.time()
             try:
                 res = process_images(pc)
+
             except Exception as e:
                 errors.display(e, "generating image for xyz plot")
 
                 res = Processed(p, [], p.seed, "")
 
+            elapsed_time = time.time() - st
+            res.extra_generation_params['elapsed_time'] = f'Execution time: {time.strftime("%H:%M:%S", time.gmtime(elapsed_time))}'
+            if annotate_time:
+                scribble_time(res.images[res.index_of_first_image], res.extra_generation_params['elapsed_time'])
             # Sets subgrid infotexts
             subgrid_index = 1 + iz
             if grid_infotext[subgrid_index] is None and ix == 0 and iy == 0:
                 pc.extra_generation_params = copy(pc.extra_generation_params)
                 pc.extra_generation_params['Script'] = self.title()
-
                 if x_opt.label != 'Nothing':
                     pc.extra_generation_params["X Type"] = x_opt.label
                     pc.extra_generation_params["X Values"] = x_values
@@ -876,12 +879,8 @@ class Script(scripts.Script):
             for g in range(grid_count):
                 # TODO: See previous comment about intentional data misalignment.
                 adj_g = g-1 if g > 0 else g
-                images.save_image(
-                    processed.images[g],
-                    p.outpath_grids, "xyz_grid", info=processed.infotexts[g],
-                    extension=opts.grid_format, prompt=processed.all_prompts[adj_g],
-                    seed=processed.all_seeds[adj_g],
-                    grid=True, p=processed)
+                images.save_image(processed.images[g], p.outpath_grids, "xyz_grid", info=processed.infotexts[g], extension=opts.grid_format,
+                                  prompt=processed.all_prompts[adj_g], seed=processed.all_seeds[adj_g], grid=True, p=processed)
                 if not include_sub_grids:  # if not include_sub_grids then skip saving after the first grid
                     break
 

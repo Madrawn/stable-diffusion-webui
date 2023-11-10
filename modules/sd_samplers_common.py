@@ -230,6 +230,13 @@ class Sampler:
         self.s_tmin = 0.0
         self.s_tmax = float('inf')
         self.s_noise = 1.0
+        self.rtol: float = 0.05
+        self.atol: float = 0.0078
+        self.h_init: float = 0.05
+        self.pcoeff: float = 0.
+        self.icoeff: float = 1.
+        self.dcoeff: float = 0.
+        self.accept_safety: float = 0.81
 
         self.eta_option_field = 'eta_ancestral'
         self.eta_infotext_field = 'Eta'
@@ -294,29 +301,6 @@ class Sampler:
                 p.extra_generation_params[self.eta_infotext_field] = self.eta
 
             extra_params_kwargs['eta'] = self.eta
-
-        if len(self.extra_params) > 0:
-            s_churn = getattr(opts, 's_churn', p.s_churn)
-            s_tmin = getattr(opts, 's_tmin', p.s_tmin)
-            s_tmax = getattr(opts, 's_tmax', p.s_tmax) or self.s_tmax # 0 = inf
-            s_noise = getattr(opts, 's_noise', p.s_noise)
-
-            if 's_churn' in extra_params_kwargs and s_churn != self.s_churn:
-                extra_params_kwargs['s_churn'] = s_churn
-                p.s_churn = s_churn
-                p.extra_generation_params['Sigma churn'] = s_churn
-            if 's_tmin' in extra_params_kwargs and s_tmin != self.s_tmin:
-                extra_params_kwargs['s_tmin'] = s_tmin
-                p.s_tmin = s_tmin
-                p.extra_generation_params['Sigma tmin'] = s_tmin
-            if 's_tmax' in extra_params_kwargs and s_tmax != self.s_tmax:
-                extra_params_kwargs['s_tmax'] = s_tmax
-                p.s_tmax = s_tmax
-                p.extra_generation_params['Sigma tmax'] = s_tmax
-            if 's_noise' in extra_params_kwargs and s_noise != self.s_noise:
-                extra_params_kwargs['s_noise'] = s_noise
-                p.s_noise = s_noise
-                p.extra_generation_params['Sigma noise'] = s_noise
 
         return extra_params_kwargs
 
