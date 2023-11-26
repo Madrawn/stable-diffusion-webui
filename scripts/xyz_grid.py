@@ -807,7 +807,10 @@ class Script(scripts.Script):
             elapsed_time = time.time() - st
             res.extra_generation_params['elapsed_time'] = f'Execution time: {time.strftime("%H:%M:%S", time.gmtime(elapsed_time))}'
             if annotate_time:
-                scribble_time(res.images[res.index_of_first_image], res.extra_generation_params['elapsed_time'])
+                try:
+                    scribble_time(res.images[res.index_of_first_image], res.extra_generation_params['elapsed_time'])
+                except:
+                    pass
             # Sets subgrid infotexts
             subgrid_index = 1 + iz
             if grid_infotext[subgrid_index] is None and ix == 0 and iy == 0:

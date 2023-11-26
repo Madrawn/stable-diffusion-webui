@@ -535,6 +535,7 @@ class Processed:
         self.clip_skip = opts.CLIP_stop_at_last_layers
         self.token_merging_ratio = p.token_merging_ratio
         self.token_merging_ratio_hr = p.token_merging_ratio_hr
+        self.sd_clip_name = (p.sd_clip_name,)
 
         self.eta = p.eta
         self.ddim_discretize = p.ddim_discretize
