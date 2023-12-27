@@ -55,6 +55,7 @@ if cmd_opts.ngrok is not None:
         cmd_opts.port if cmd_opts.port is not None else 7860,
         cmd_opts.ngrok_options
         )
+        )
 
 
 def gr_show(visible=True):
@@ -313,10 +314,6 @@ def create_ui():
                                 with enable_hr.extra():
                                     hr_final_resolution = FormHTML(value="", elem_id="txtimg_hr_finalres", label="Upscaled resolution", interactive=False, min_width=0)
 
-                                with FormRow(elem_id="txt2img_hires_fix_row0", variant="compact"):
-                                    hr_shrink = gr.Checkbox(value=True, label="Shrink latent between repeats", elem_id="txt2img_hr_shrink", scale=0, min_width=100)
-                                    hr_repeat = gr.Slider(minimum=1, step=1, label="Repeat n times", value=1, elem_id="txt2img_hr_repeat", scale=1)
-
                                 with FormRow(elem_id="txt2img_hires_fix_row1", variant="compact"):
                                     hr_upscaler = gr.Dropdown(label="Upscaler", elem_id="txt2img_hr_upscaler", choices=[*shared.latent_upscale_modes, *[x.name for x in shared.sd_upscalers]], value=shared.latent_upscale_default_mode)
                                     hr_second_pass_steps = gr.Slider(minimum=0, maximum=150, step=1, label='Hires steps', value=0, elem_id="txt2img_hires_steps")
@@ -408,8 +405,6 @@ def create_ui():
                     hr_sampler_name,
                     hr_prompt,
                     hr_negative_prompt,
-                    hr_repeat,
-                    hr_shrink,
                     override_settings,
 
                 ] + custom_inputs,

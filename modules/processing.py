@@ -95,9 +95,8 @@ def create_binary_mask(image, round=True):
         image = image.convert('L')
     return image
 
-
 def txt2img_image_conditioning(sd_model, x, width, height):
-    if sd_model.model.conditioning_key in {'hybrid', 'concat'}:  # Inpainting models
+    if sd_model.model.conditioning_key in {'hybrid', 'concat'}: # Inpainting models
 
         # The "masked-image" in this case will just be all 0.5 since the entire image is masked.
         image_conditioning = torch.ones(x.shape[0], 3, height, width, device=x.device) * 0.5
@@ -109,7 +108,7 @@ def txt2img_image_conditioning(sd_model, x, width, height):
 
         return image_conditioning
 
-    elif sd_model.model.conditioning_key == "crossattn-adm":  # UnCLIP models
+    elif sd_model.model.conditioning_key == "crossattn-adm": # UnCLIP models
 
         return x.new_zeros(x.shape[0], 2*sd_model.noise_augmentor.time_embed.dim, dtype=x.dtype, device=x.device)
 
@@ -328,7 +327,7 @@ class StableDiffusionProcessing:
     def unclip_image_conditioning(self, source_image):
         c_adm = self.sd_model.embedder(source_image)
         if self.sd_model.noise_augmentor is not None:
-            noise_level = 0  # TODO: Allow other noise levels?
+            noise_level = 0 # TODO: Allow other noise levels?
             c_adm, noise_level_emb = self.sd_model.noise_augmentor(c_adm, noise_level=repeat(torch.tensor([noise_level]).to(c_adm.device), '1 -> b', b=c_adm.shape[0]))
             c_adm = torch.cat((c_adm, noise_level_emb), 1)
         return c_adm
@@ -413,7 +412,7 @@ class StableDiffusionProcessing:
         return self.token_merging_ratio or opts.token_merging_ratio
 
     def setup_prompts(self):
-        if isinstance(self.prompt, list):
+        if isinstance(self.prompt,list):
             self.all_prompts = self.prompt
         elif isinstance(self.negative_prompt, list):
             self.all_prompts = [self.prompt] * len(self.negative_prompt)
@@ -511,9 +510,7 @@ class StableDiffusionProcessing:
 
 
 class Processed:
-    def __init__(
-            self, p: StableDiffusionProcessing, images_list, seed=-1, info="", subseed=None, all_prompts=None, all_negative_prompts=None, all_seeds=None, all_subseeds=None,
-            index_of_first_image=0, infotexts=None, comments=""):
+    def __init__(self, p: StableDiffusionProcessing, images_list, seed=-1, info="", subseed=None, all_prompts=None, all_negative_prompts=None, all_seeds=None, all_subseeds=None, index_of_first_image=0, infotexts=None, comments=""):
         self.images = images_list
         self.prompt = p.prompt
         self.negative_prompt = p.negative_prompt
@@ -786,7 +783,7 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
     """this is the main loop that both txt2img and img2img use; it calls func_init once inside all the scopes and func_sample once per batch"""
 
     if isinstance(p.prompt, list):
-        assert (len(p.prompt) > 0)
+        assert(len(p.prompt) > 0)
     else:
         assert p.prompt is not None
 
@@ -865,8 +862,7 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
             p.seeds = p.all_seeds[n * p.batch_size:(n + 1) * p.batch_size]
             p.subseeds = p.all_subseeds[n * p.batch_size:(n + 1) * p.batch_size]
 
-            p.rng = rng.ImageRNG((opt_C, p.height // opt_f, p.width // opt_f), p.seeds, subseeds=p.subseeds, subseed_strength=p.subseed_strength,
-                                 seed_resize_from_h=p.seed_resize_from_h, seed_resize_from_w=p.seed_resize_from_w)
+            p.rng = rng.ImageRNG((opt_C, p.height // opt_f, p.width // opt_f), p.seeds, subseeds=p.subseeds, subseed_strength=p.subseed_strength, seed_resize_from_h=p.seed_resize_from_h, seed_resize_from_w=p.seed_resize_from_w)
 
             if p.scripts is not None:
                 p.scripts.before_process_batch(p, batch_number=n, prompts=p.prompts, seeds=p.seeds, subseeds=p.subseeds)
@@ -903,13 +899,7 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
                 shared.state.job = f"Batch {n+1} out of {p.n_iter}"
 
             with devices.without_autocast() if devices.unet_needs_upcast else devices.autocast():
-                samples_ddim = p.sample(conditioning=p.c, unconditional_conditioning=p.uc, seeds=p.seeds,
-                                        subseeds=p.subseeds, subseed_strength=p.subseed_strength, prompts=p.prompts)
-
-            if p.scripts is not None:
-                ps = scripts.PostSampleArgs(samples_ddim)
-                p.scripts.post_sample(p, ps)
-                samples_ddim = ps.samples
+                samples_ddim = p.sample(conditioning=p.c, unconditional_conditioning=p.uc, seeds=p.seeds, subseeds=p.subseeds, subseed_strength=p.subseed_strength, prompts=p.prompts)
 
             if p.scripts is not None:
                 ps = scripts.PostSampleArgs(samples_ddim)
@@ -958,12 +948,7 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
 
                 if p.restore_faces:
                     if save_samples and opts.save_images_before_face_restoration:
-                        images.save_image(
-                            Image.fromarray(x_sample),
-                            p.outpath_samples, "", p.seeds[i],
-                            p.prompts[i],
-                            opts.samples_format, info=infotext(i),
-                            p=p, suffix="-before-face-restoration")
+                        images.save_image(Image.fromarray(x_sample), p.outpath_samples, "", p.seeds[i], p.prompts[i], opts.samples_format, info=infotext(i), p=p, suffix="-before-face-restoration")
 
                     devices.torch_gc()
 
@@ -1048,8 +1033,7 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
                 output_images.insert(0, grid)
                 index_of_first_image = 1
             if opts.grid_save:
-                images.save_image(grid, p.outpath_grids, "grid", p.all_seeds[0], p.all_prompts[0], opts.grid_format,
-                                  info=infotext(use_main_prompt=True), short_filename=not opts.grid_extended_filename, p=p, grid=True)
+                images.save_image(grid, p.outpath_grids, "grid", p.all_seeds[0], p.all_prompts[0], opts.grid_format, info=infotext(use_main_prompt=True), short_filename=not opts.grid_extended_filename, p=p, grid=True)
 
     if not p.disable_extra_networks and p.extra_network_data:
         extra_networks.deactivate(p, p.extra_network_data)
@@ -1189,9 +1173,7 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
             if tuple(self.hr_negative_prompt) != tuple(self.negative_prompt):
                 self.extra_generation_params["Hires negative prompt"] = self.hr_negative_prompt
 
-            self.latent_scale_mode = shared.latent_upscale_modes.get(
-                self.hr_upscaler, None) if self.hr_upscaler is not None else shared.latent_upscale_modes.get(
-                shared.latent_upscale_default_mode, "nearest")
+            self.latent_scale_mode = shared.latent_upscale_modes.get(self.hr_upscaler, None) if self.hr_upscaler is not None else shared.latent_upscale_modes.get(shared.latent_upscale_default_mode, "nearest")
             if self.enable_hr and self.latent_scale_mode is None:
                 if not any(x.name == self.hr_upscaler for x in shared.sd_upscalers):
                     raise Exception(f"could not find upscaler named {self.hr_upscaler}")
@@ -1202,15 +1184,12 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
                 if state.job_count == -1:
                     state.job_count = self.n_iter
 
-                shared.total_tqdm.updateTotal((self.steps + (self.hr_second_pass_steps or self.steps) * self.hr_repeat) * state.job_count)
-                state.job_count = state.job_count * (2 + self.hr_repeat)
+                shared.total_tqdm.updateTotal((self.steps + (self.hr_second_pass_steps or self.steps)) * state.job_count)
+                state.job_count = state.job_count * 2
                 state.processing_has_refined_job_count = True
 
             if self.hr_second_pass_steps:
                 self.extra_generation_params["Hires steps"] = self.hr_second_pass_steps
-
-            if self.hr_repeat > 1:
-                self.extra_generation_params["Hires repeats"] = self.hr_repeat
 
             if self.hr_upscaler is not None:
                 self.extra_generation_params["Hires upscaler"] = self.hr_upscaler
@@ -1226,16 +1205,13 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
             return samples
         devices.torch_gc()
 
-        self.rng = rng.ImageRNG([samples.shape[1],self.hr_upscale_to_x // opt_f, self.hr_upscale_to_y // opt_f], self.seeds, subseeds=self.subseeds, subseed_strength=self.subseed_strength,
-                                seed_resize_from_h=self.seed_resize_from_h, seed_resize_from_w=self.seed_resize_from_w)
-        for i in range(self.hr_repeat):
-            if self.latent_scale_mode is None:
-                decoded_samples = torch.stack(decode_latent_batch(self.sd_model, samples, target_device=devices.cpu, check_for_nans=True)).to(dtype=torch.float32)
-            else:
-                decoded_samples = None
+        if self.latent_scale_mode is None:
+            decoded_samples = torch.stack(decode_latent_batch(self.sd_model, samples, target_device=devices.cpu, check_for_nans=True)).to(dtype=torch.float32)
+        else:
+            decoded_samples = None
 
-            with sd_models.SkipWritingToConfig():
-                sd_models.reload_model_weights(info=self.hr_checkpoint_info)
+        with sd_models.SkipWritingToConfig():
+            sd_models.reload_model_weights(info=self.hr_checkpoint_info)
 
         return self.sample_hr_pass(samples, decoded_samples, seeds, subseeds, subseed_strength, prompts)
 
@@ -1267,10 +1243,7 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
             for i in range(samples.shape[0]):
                 save_intermediate(samples, i)
 
-            samples = torch.nn.functional.interpolate(
-                samples, size=(target_height // opt_f, target_width // opt_f),
-                mode=self.latent_scale_mode["mode"],
-                antialias=self.latent_scale_mode["antialias"])
+            samples = torch.nn.functional.interpolate(samples, size=(target_height // opt_f, target_width // opt_f), mode=self.latent_scale_mode["mode"], antialias=self.latent_scale_mode["antialias"])
 
             # Avoid making the inpainting conditioning unless necessary as
             # this does need some extra compute to decode / encode the image again.
@@ -1307,6 +1280,7 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
 
         samples = samples[:, :, self.truncate_y//2:samples.shape[2]-(self.truncate_y+1)//2, self.truncate_x//2:samples.shape[3]-(self.truncate_x+1)//2]
 
+        self.rng = rng.ImageRNG(samples.shape[1:], self.seeds, subseeds=self.subseeds, subseed_strength=self.subseed_strength, seed_resize_from_h=self.seed_resize_from_h, seed_resize_from_w=self.seed_resize_from_w)
         noise = self.rng.next()
 
         # GC now before running the next img2img to prevent running out of memory
@@ -1324,12 +1298,15 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
         if self.scripts is not None:
             self.scripts.before_hr(self)
 
-        samples = self.sampler.sample_img2img(self, samples, noise, self.hr_c, self.hr_uc, steps=self.hr_second_pass_steps or None, image_conditioning=image_conditioning)
+        samples = self.sampler.sample_img2img(self, samples, noise, self.hr_c, self.hr_uc, steps=self.hr_second_pass_steps or self.steps, image_conditioning=image_conditioning)
 
         sd_models.apply_token_merging(self.sd_model, self.get_token_merging_ratio())
 
         self.sampler = None
         devices.torch_gc()
+
+        decoded_samples = decode_latent_batch(self.sd_model, samples, target_device=devices.cpu, check_for_nans=True)
+
         self.is_hr_pass = False
         return decoded_samples
 
@@ -1377,10 +1354,8 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
         steps = self.hr_second_pass_steps or self.steps
         total_steps = sampler_config.total_steps(steps) if sampler_config else steps
 
-        self.hr_uc = self.get_conds_with_caching(prompt_parser.get_learned_conditioning, hr_negative_prompts, self.firstpass_steps,
-                                                 [self.cached_hr_uc, self.cached_uc], self.hr_extra_network_data, total_steps)
-        self.hr_c = self.get_conds_with_caching(prompt_parser.get_multicond_learned_conditioning, hr_prompts, self.firstpass_steps,
-                                                [self.cached_hr_c, self.cached_c], self.hr_extra_network_data, total_steps)
+        self.hr_uc = self.get_conds_with_caching(prompt_parser.get_learned_conditioning, hr_negative_prompts, self.firstpass_steps, [self.cached_hr_uc, self.cached_uc], self.hr_extra_network_data, total_steps)
+        self.hr_c = self.get_conds_with_caching(prompt_parser.get_multicond_learned_conditioning, hr_prompts, self.firstpass_steps, [self.cached_hr_c, self.cached_c], self.hr_extra_network_data, total_steps)
 
     def setup_conds(self):
         if self.is_hr_pass:
@@ -1398,8 +1373,7 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
             if shared.opts.hires_fix_use_firstpass_conds:
                 self.calculate_hr_conds()
 
-            # if in lowvram mode, we need to calculate conds right away, before the cond NN is unloaded
-            elif lowvram.is_enabled(shared.sd_model) and shared.sd_model.sd_checkpoint_info == sd_models.select_checkpoint():
+            elif lowvram.is_enabled(shared.sd_model) and shared.sd_model.sd_checkpoint_info == sd_models.select_checkpoint():  # if in lowvram mode, we need to calculate conds right away, before the cond NN is unloaded
                 with devices.autocast():
                     extra_networks.activate(self, self.hr_extra_network_data)
 
@@ -1630,5 +1604,4 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
         return samples
 
     def get_token_merging_ratio(self, for_hr=False):
-        return self.token_merging_ratio or (
-            "token_merging_ratio" in self.override_settings and opts.token_merging_ratio) or opts.token_merging_ratio_img2img or opts.token_merging_ratio
+        return self.token_merging_ratio or ("token_merging_ratio" in self.override_settings and opts.token_merging_ratio) or opts.token_merging_ratio_img2img or opts.token_merging_ratio
