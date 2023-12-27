@@ -330,8 +330,9 @@ axis_options: list[AxisOption | AxisOptionImg2Img | AxisOptionTxt2Img] = [
         format_value=format_remove_path, confirm=confirm_checkpoints_or_none, cost=1.0, choices=lambda: ['None'] +
         sorted(sd_models.checkpoints_list, key=str.casefold)),
     AxisOption("Refiner switch at", float, apply_field('refiner_switch_at')),
-    AxisOption("RNG source", str, apply_override("randn_source"),
-               choices=lambda: ["GPU", "CPU", "NV"]),]
+    AxisOption("RNG source", str, apply_override("randn_source"), choices=lambda: ["GPU", "CPU", "NV"]),
+    AxisOption("FP8 mode", str, apply_override("fp8_storage"), cost=0.9, choices=lambda: ["Disable", "Enable for SDXL", "Enable"]),
+]
 
 
 def draw_xyz_grid(p, xs, ys, zs, x_labels, y_labels, z_labels, cell, draw_legend, include_lone_images,
