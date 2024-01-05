@@ -91,6 +91,9 @@ class Script:
     setup_for_ui_only = False
     """If true, the script setup will only be run in Gradio UI, not in API"""
 
+    controls = None
+    """A list of controls retured by the ui()."""
+
     def title(self):
         """this function should return the title of the script. This is what will be displayed in the dropdown menu."""
 
@@ -566,7 +569,12 @@ class ScriptRunner:
         auto_processing_scripts = scripts_auto_postprocessing.create_auto_preprocessing_script_data()
 
         for script_data in auto_processing_scripts + scripts_data:
-            script = script_data.script_class()
+            try:
+                script = script_data.script_class()
+            except Exception:
+                errors.report(f"Error # failed to initialize Script {script_data.module}: ", exc_info=True)
+                continue
+
             script.filename = script_data.path
             script.is_txt2img = not is_img2img
             script.is_img2img = is_img2img
@@ -619,6 +627,7 @@ class ScriptRunner:
         import modules.api.models as api_models
 
         controls = wrap_call(script.ui, script.filename, "ui", script.is_img2img)
+        script.controls = controls
 
         if controls is None:
             return
@@ -691,6 +700,8 @@ class ScriptRunner:
         self.setup_ui_for_section(None, self.selectable_scripts)
 
         def select_script(script_index):
+            if script_index is None:
+                script_index = 0
             selected_script = self.selectable_scripts[script_index - 1] if script_index>0 else None
 
             return [gr.update(visible=selected_script == s) for s in self.selectable_scripts]
@@ -734,7 +745,7 @@ class ScriptRunner:
     def run(self, p, *args):
         script_index = args[0]
 
-        if script_index == 0:
+        if script_index == 0 or script_index is None:
             return None
 
         script = self.selectable_scripts[script_index-1]
@@ -910,6 +921,23 @@ class ScriptRunner:
                 script.setup(p, *script_args)
             except Exception:
                 errors.report(f"Error running setup: {script.filename}", exc_info=True)
+
+    def set_named_arg(self, args, script_type, arg_elem_id, value):
+        script = next((x for x in self.scripts if type(x).__name__ == script_type), None)
+        if script is None:
+            return
+
+        for i, control in enumerate(script.controls):
+            if arg_elem_id in control.elem_id:
+                index = script.args_from + i
+
+                if isinstance(args, list):
+                    args[index] = value
+                    return args
+                elif isinstance(args, tuple):
+                    return args[:index] + (value,) + args[index+1:]
+                else:
+                    return None
 
 
 scripts_txt2img: ScriptRunner = None
