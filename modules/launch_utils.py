@@ -55,7 +55,7 @@ and delete current Python and "venv" folder in WebUI's directory.
 
 You can download 3.10 Python from here: https://www.python.org/downloads/release/python-3106/
 
-{"Alternatively, use a binary release of WebUI: https://github.com/AUTOMATIC1111/stable-diffusion-webui/releases" if is_windows else ""}
+{"Alternatively, use a binary release of WebUI: https://github.com/AUTOMATIC1111/stable-diffusion-webui/releases/tag/v1.0.0-pre" if is_windows else ""}
 
 Use --skip-python-version-check to suppress this warning.
 """)
@@ -188,7 +188,7 @@ def git_clone(url, dir, name, commithash=None):
         return
 
     try:
-        run(f'"{git}" clone "{url}" "{dir}"', f"Cloning {name} into {dir}...", f"Couldn't clone {name}", live=True)
+        run(f'"{git}" clone --config core.filemode=false "{url}" "{dir}"', f"Cloning {name} into {dir}...", f"Couldn't clone {name}", live=True)
     except RuntimeError:
         shutil.rmtree(dir, ignore_errors=True)
         raise

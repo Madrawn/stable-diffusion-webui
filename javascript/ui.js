@@ -319,8 +319,6 @@ onAfterUiUpdate(function() {
     });
 
     json_elem.parentElement.style.display = "none";
-
-    setupTokenCounters();
 });
 
 onOptionsChanged(function() {
@@ -413,7 +411,7 @@ function switchWidthHeight(tabname) {
 
 var onEditTimers = {};
 
-// calls func after afterMs milliseconds has passed since the input elem has beed enited by user
+// calls func after afterMs milliseconds has passed since the input elem has been edited by user
 function onEdit(editId, elem, afterMs, func) {
     var edited = function() {
         var existingTimer = onEditTimers[editId];
