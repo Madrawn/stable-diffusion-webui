@@ -280,6 +280,7 @@ axis_options: list[AxisOption | AxisOptionImg2Img | AxisOptionTxt2Img] = [
     AxisOption("[DPM adaptive] accept safety factor", float, apply_field("accept_safety")),
     AxisOption("Schedule type", str, apply_override("k_sched_type"),
                choices=lambda: list(sd_samplers_kdiffusion.k_diffusion_scheduler)),
+    AxisOption("Schedule type", str, apply_override("k_sched_type"), choices=lambda: list(sd_samplers_kdiffusion.k_diffusion_scheduler)),
     AxisOption("Schedule min sigma", float, apply_override("sigma_min")),
     AxisOption("Schedule max sigma", float, apply_override("sigma_max")),
     AxisOption("Schedule rho", float, apply_override("rho")),
@@ -485,8 +486,6 @@ class Script(scripts.Script):
                 csv_mode = gr.Checkbox(label='Use text inputs instead of dropdowns', value=False, elem_id=self.elem_id("csv_mode"))
             with gr.Column():
                 margin_size = gr.Slider(label="Grid margins (px)", minimum=0, maximum=500, value=0, step=2, elem_id=self.elem_id("margin_size"))
-            with gr.Column():
-                csv_mode = gr.Checkbox(label='Use text inputs instead of dropdowns', value=False, elem_id=self.elem_id("csv_mode"))
                 annotate_time = gr.Checkbox(label='Write the time taken per image ontop of them in the grid', value=False, elem_id=self.elem_id("annotate_time"))
 
         with gr.Row(variant="compact", elem_id="swap_axes"):
@@ -859,8 +858,6 @@ class Script(scripts.Script):
                 del processed.infotexts[1]
 
         return processed
-
-
 def scribble_time(image: Image.Image, txt: str):
     draw = ImageDraw.Draw(image)
     fnt = images.get_font(14)
@@ -868,21 +865,3 @@ def scribble_time(image: Image.Image, txt: str):
     draw.rounded_rectangle(box, radius=4, fill="black")
     draw.text((12, 12), txt, fill="white", font=fnt)
 
-
-# Verify grid extension is present
-if importlib.util.find_spec("gridgencore") is not None:
-    import gridgencore
-    from gridgencore import GridSettingMode
-    # p is the SD processing object, v is the value
-
-    def apply(p, v):
-        p.some_setting_here = v
-    # dry: bool, type: str, apply: callable, min: float = None, max: float = None, clean: callable = None
-    # for apply if the param is a 'p' field, you can use gridgencore.apply_field("fieldname")
-    for option in axis_options:
-        if (option.label.lower().replace(' ', '').replace('.', '').replace('[', '').replace(']', '').strip()) not in list(gridgencore.valid_modes.keys()):
-            try:
-                typetext = str(option.type).split('\'')[1]
-                gridgencore.registerMode(option.label, GridSettingMode(True, typetext, option.apply))
-            except:
-                pass
