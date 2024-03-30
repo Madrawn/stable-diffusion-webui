@@ -713,10 +713,6 @@ class Api:
         import modules.sd_vae as sd_vae
         return [{"model_name": x, "filename": sd_vae.vae_dict[x]} for x in sd_vae.vae_dict.keys()]
 
-    def get_sd_clips(self):
-        import modules.sd_clip as sd_clip
-        return [{"model_name": x, "filename": sd_clip.clip_dict[x]} for x in sd_clip.clip_dict.keys()]
-
     def get_hypernetworks(self):
         return [{"name": name, "path": shared.hypernetworks[name]} for name in shared.hypernetworks]
 
@@ -765,10 +761,6 @@ class Api:
     def refresh_vae(self):
         with self.queue_lock:
             shared_items.refresh_vae_list()
-
-    def refresh_clip(self):
-        with self.queue_lock:
-            shared_items.refresh_clip_list()
 
     def create_embedding(self, args: dict):
         try:

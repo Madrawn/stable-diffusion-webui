@@ -16,7 +16,7 @@ from skimage import exposure
 from typing import Any
 
 import modules.sd_hijack
-from modules import devices, prompt_parser, masking, sd_samplers, sd_clip, lowvram, infotext_utils, extra_networks, sd_vae_approx, scripts, sd_samplers_common, sd_unet, errors, rng
+from modules import devices, prompt_parser, masking, sd_samplers, lowvram, infotext_utils, extra_networks, sd_vae_approx, scripts, sd_samplers_common, sd_unet, errors, rng
 from modules.rng import slerp # noqa: F401
 from modules.sd_hijack import model_hijack
 from modules.sd_samplers_common import images_tensor_to_samples, decode_first_stage, approximation_indexes
@@ -233,8 +233,6 @@ class StableDiffusionProcessing:
     sd_model_hash: str = field(default=None, init=False)
     sd_vae_name: str = field(default=None, init=False)
     sd_vae_hash: str = field(default=None, init=False)
-    sd_clip_name: str = field(default=None, init=False)
-    sd_clip_hash: str = field(default=None, init=False)
 
     is_api: bool = field(default=False, init=False)
 
@@ -467,7 +465,6 @@ class StableDiffusionProcessing:
             hires_steps,
             use_old_scheduling,
             opts.CLIP_stop_at_last_layers,
-            self.sd_clip_hash,
             shared.sd_model.sd_checkpoint_info,
             extra_network_data,
             opts.sdxl_crop_left,
@@ -568,7 +565,6 @@ class Processed:
         self.clip_skip = opts.CLIP_stop_at_last_layers
         self.token_merging_ratio = p.token_merging_ratio
         self.token_merging_ratio_hr = p.token_merging_ratio_hr
-        self.sd_clip_name = (p.sd_clip_name,)
 
         self.eta = p.eta
         self.ddim_discretize = p.ddim_discretize
@@ -854,8 +850,6 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
     p.sd_model_hash = shared.sd_model.sd_model_hash
     p.sd_vae_name = sd_vae.get_loaded_vae_name()
     p.sd_vae_hash = sd_vae.get_loaded_vae_hash()
-    p.sd_clip_name = sd_clip.get_loaded_clip_name()
-    p.sd_clip_hash = sd_clip.get_loaded_clip_hash()
 
     modules.sd_hijack.model_hijack.apply_circular(p.tiling)
     modules.sd_hijack.model_hijack.clear_comments()
