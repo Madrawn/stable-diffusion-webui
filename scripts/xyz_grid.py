@@ -1,26 +1,28 @@
+import csv
 import importlib
+import os.path
+import random
+import re
 from collections import namedtuple
 from copy import copy
-from itertools import permutations, chain
-import random
-import csv
-import os.path
 from io import StringIO
-from PIL import Image, ImageDraw
+from itertools import chain, permutations
+
+import gradio as gr
 import numpy as np
+from PIL import Image, ImageDraw
 
 import modules.scripts as scripts
-import gradio as gr
-
-from modules import images, sd_samplers, processing, sd_models, sd_vae, sd_schedulers, errors
-from modules.processing import process_images, Processed, StableDiffusionProcessingTxt2Img
-from modules.shared import opts, state
-import modules.shared as shared
-import modules.sd_samplers
 import modules.sd_models
+import modules.sd_samplers
 import modules.sd_vae
-import re
-
+import modules.shared as shared
+from modules import (errors, images, processing, sd_models, sd_samplers,
+                     sd_samplers_cfg_denoiser, sd_samplers_common,
+                     sd_samplers_kdiffusion, sd_schedulers, sd_vae, shared)
+from modules.processing import (Processed, StableDiffusionProcessingTxt2Img,
+                                process_images)
+from modules.shared import opts, state
 from modules.ui_components import ToolButton
 
 fill_values_symbol = "\U0001f4d2"  # 📒
@@ -272,9 +274,7 @@ axis_options: list[AxisOption | AxisOptionImg2Img | AxisOptionTxt2Img] = [
     AxisOption("[DPM adaptive] integral coefficient", float, apply_field("icoeff")),
     AxisOption("[DPM adaptive] derivative coefficient", float, apply_field("dcoeff")),
     AxisOption("[DPM adaptive] accept safety factor", float, apply_field("accept_safety")),
-    AxisOption("Schedule type", str, apply_override("k_sched_type"),
-               choices=lambda: list(sd_samplers_kdiffusion.k_diffusion_scheduler)),
-    AxisOption("Schedule type", str, apply_override("k_sched_type"), choices=lambda: list(sd_samplers_kdiffusion.k_diffusion_scheduler)),
+    AxisOption("Schedule type", str, apply_field("scheduler"), choices=lambda: [x.label for x in sd_schedulers.schedulers]),
     AxisOption("Schedule min sigma", float, apply_override("sigma_min")),
     AxisOption("Schedule max sigma", float, apply_override("sigma_max")),
     AxisOption("Schedule rho", float, apply_override("rho")),

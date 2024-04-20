@@ -377,7 +377,6 @@ options_templates.update(options_section(('sampler-params', "Sampler parameters"
     "dcoeff": OptionInfo(default=0.0, label="derivative coefficient", component=gr.Slider, component_args={"minimum": -5.0, "maximum": 5.0, "step": 0.1}, infotext='Derivative coefficient').info('controls how much the step size changes based on the rate of change of the error. default=0.0'),
     "accept_safety": OptionInfo(default=0.81, label="accept safety", component=gr.Slider, component_args={"minimum": 0.0, "maximum": 1.0, "step": 0.01}, infotext='accept safety factor').info('accept safety prevents the factor between consecutive step sizes to be smaller than this factor. default=0.81'),
     "dpm_adapt_end": OptionHTML(""),
-    'k_sched_type':  OptionInfo("Automatic", "Scheduler type", gr.Dropdown, {"choices": ["Automatic", "karras", "exponential", "polyexponential"]}, infotext='Schedule type').info("lets you override the noise schedule for k-diffusion samplers; choosing Automatic disables the three parameters below"),
     'sigma_min': OptionInfo(0.0, "sigma min", gr.Number, infotext='Schedule min sigma').info("0 = default (~0.03); minimum noise strength for k-diffusion noise scheduler"),
     'sigma_max': OptionInfo(0.0, "sigma max", gr.Number, infotext='Schedule max sigma').info("0 = default (~14.6); maximum noise strength for k-diffusion noise scheduler"),
     'rho':  OptionInfo(0.0, "rho", gr.Number, infotext='Schedule rho').info("0 = default (7 for karras, 1 for polyexponential); higher values result in a steeper noise schedule (decreases faster)"),
