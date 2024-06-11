@@ -132,6 +132,17 @@ document.addEventListener('keydown', function(e) {
     const isAltKey = e.altKey;
     const isEsc = e.key === 'Escape';
 
+    if(e.key === "s" && isCtrlKey && isAltKey) {
+        let removeDuplicates = (str) => [...(new Set(str.value.split(',').map(x=>x.trim())))].join(', ')
+        const pos_p = get_uiCurrentTabContent().querySelector('#txt2img_prompt textarea');
+        const neg_p = get_uiCurrentTabContent().querySelector('#txt2img_neg_prompt textarea');
+        pos_p.value = removeDuplicates(pos_p);
+        neg_p.value = removeDuplicates(neg_p);
+        let a = new InputEvent("input")
+        pos_p.dispatchEvent(a);
+        neg_p.dispatchEvent(a);
+    }
+
     const generateButton = get_uiCurrentTabContent().querySelector('button[id$=_generate]');
     const interruptButton = get_uiCurrentTabContent().querySelector('button[id$=_interrupt]');
     const skipButton = get_uiCurrentTabContent().querySelector('button[id$=_skip]');
