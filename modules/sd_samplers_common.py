@@ -54,7 +54,7 @@ def samples_to_images_tensor(sample, approximation=None, model=None):
     else:
         if model is None:
             model = shared.sd_model
-        with devices.without_autocast(): # fixes an issue with unstable VAEs that are flaky even in fp32
+        with torch.no_grad(), devices.without_autocast(): # fixes an issue with unstable VAEs that are flaky even in fp32
             x_sample = model.decode_first_stage(sample.to(model.first_stage_model.dtype))
 
     return x_sample
@@ -163,7 +163,7 @@ def apply_refiner(cfg_denoiser, sigma=None):
     else:
         # torch.max(sigma) only to handle rare case where we might have different sigmas in the same batch
         try:
-            timestep = torch.argmin(torch.abs(cfg_denoiser.inner_model.sigmas - torch.max(sigma)))
+            timestep = torch.argmin(torch.abs(cfg_denoiser.inner_model.sigmas.to(sigma.device) - torch.max(sigma)))
         except AttributeError:  # for samplers that don't use sigmas (DDIM) sigma is actually the timestep
             timestep = torch.max(sigma).to(dtype=int)
         completed_ratio = (999 - timestep) / 1000
@@ -241,19 +241,12 @@ class Sampler:
         self.s_tmin = 0.0
         self.s_tmax = float('inf')
         self.s_noise = 1.0
-        self.rtol: float = 0.05
-        self.atol: float = 0.0078
-        self.h_init: float = 0.05
-        self.pcoeff: float = 0.
-        self.icoeff: float = 1.
-        self.dcoeff: float = 0.
-        self.accept_safety: float = 0.81
 
         self.eta_option_field = 'eta_ancestral'
         self.eta_infotext_field = 'Eta'
         self.eta_default = 1.0
 
-        self.conditioning_key = shared.sd_model.model.conditioning_key
+        self.conditioning_key = getattr(shared.sd_model.model, 'conditioning_key', 'crossattn')
 
         self.p = None
         self.model_wrap_cfg = None
@@ -312,6 +305,29 @@ class Sampler:
                 p.extra_generation_params[self.eta_infotext_field] = self.eta
 
             extra_params_kwargs['eta'] = self.eta
+
+        if len(self.extra_params) > 0:
+            s_churn = getattr(opts, 's_churn', p.s_churn)
+            s_tmin = getattr(opts, 's_tmin', p.s_tmin)
+            s_tmax = getattr(opts, 's_tmax', p.s_tmax) or self.s_tmax # 0 = inf
+            s_noise = getattr(opts, 's_noise', p.s_noise)
+
+            if 's_churn' in extra_params_kwargs and s_churn != self.s_churn:
+                extra_params_kwargs['s_churn'] = s_churn
+                p.s_churn = s_churn
+                p.extra_generation_params['Sigma churn'] = s_churn
+            if 's_tmin' in extra_params_kwargs and s_tmin != self.s_tmin:
+                extra_params_kwargs['s_tmin'] = s_tmin
+                p.s_tmin = s_tmin
+                p.extra_generation_params['Sigma tmin'] = s_tmin
+            if 's_tmax' in extra_params_kwargs and s_tmax != self.s_tmax:
+                extra_params_kwargs['s_tmax'] = s_tmax
+                p.s_tmax = s_tmax
+                p.extra_generation_params['Sigma tmax'] = s_tmax
+            if 's_noise' in extra_params_kwargs and s_noise != self.s_noise:
+                extra_params_kwargs['s_noise'] = s_noise
+                p.s_noise = s_noise
+                p.extra_generation_params['Sigma noise'] = s_noise
 
         return extra_params_kwargs
 
